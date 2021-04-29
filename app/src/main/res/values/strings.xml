@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Workout Buddy</string>
+    <string name="login">Login</string>
+    <string name="signup">Signup</string>
+    <string name="workout_buddy">Workout Buddy</string>
+    <string name="calorie_tracker">Calorie Tracker</string>
+    <string name="add_workout"> Create Workout </string>
+    <string name="workout">Start Workout</string>
+</resources>
