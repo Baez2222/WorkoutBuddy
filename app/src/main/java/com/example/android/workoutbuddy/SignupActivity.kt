@@ -1,14 +1,18 @@
 package com.example.android.workoutbuddy
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.android.workoutbuddy.databinding.ActivitySignupBinding
+import java.io.IOException
+import java.io.InputStream
 
 class SignupActivity : AppCompatActivity() {
 
@@ -18,6 +22,7 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var editText_rpassword: EditText
 //    private lateinit var editText_email: EditText
     private lateinit var button_signup: Button
+    private lateinit var imageView_logo: ImageView
 
 
     private val appViewModel : AppViewModel by viewModels{
@@ -34,6 +39,7 @@ class SignupActivity : AppCompatActivity() {
         editText_rpassword = binding.editTextSReenterPassword
 //        editText_email = binding.editTextSEmail
         button_signup = binding.buttonSSignup
+        imageView_logo= binding.imageViewSignup
 
 
         button_signup.setOnClickListener {
@@ -61,6 +67,17 @@ class SignupActivity : AppCompatActivity() {
                     }
                 })
             }
+        }
+
+        // set logo
+        var inputStream: InputStream? = null
+        try {
+            inputStream = assets.open("free-logo.png")
+            val brew = Drawable.createFromStream(inputStream, null)
+            imageView_logo.setImageDrawable(brew)
+            inputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 

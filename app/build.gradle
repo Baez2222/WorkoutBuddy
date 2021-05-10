@@ -47,6 +47,10 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'com.loopj.android:android-async-http:1.4.9'
+
+    // pop up window dependency + recyclerview
+    implementation "androidx.cardview:cardview:1.0.0"
 
 
     def roomVersion = '2.2.5'
@@ -71,4 +75,8 @@ dependencies {
 
     // activity version
     implementation "androidx.activity:activity-ktx:$activityVersion"
+
+    // dependency of linear time animation
+    implementation 'com.github.krtkush:LinearTimer:v2.0.1'
+
 }

@@ -1,15 +1,19 @@
 package com.example.android.workoutbuddy
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.android.workoutbuddy.databinding.ActivityLoginBinding
+import java.io.IOException
+import java.io.InputStream
 
 class LoginActivity: AppCompatActivity() {
 
@@ -17,6 +21,7 @@ class LoginActivity: AppCompatActivity() {
     private lateinit var editText_username: EditText
     private lateinit var editText_password: EditText
     private lateinit var button_login: Button
+    private lateinit var imageView_logo: ImageView
 
     private val appViewModel : AppViewModel by viewModels{
         AppViewModelFactory((application as AppApplication).repository)
@@ -30,6 +35,7 @@ class LoginActivity: AppCompatActivity() {
         editText_username = binding.editTextLUsername
         editText_password = binding.editTextLPassword
         button_login = binding.buttonLSignup
+        imageView_logo = binding.imageViewLogin
 
 
         button_login.setOnClickListener {
@@ -42,11 +48,23 @@ class LoginActivity: AppCompatActivity() {
                         if (user.title == editText_username.text.toString() && user.content == editText_password.text.toString().toInt()){
                             Toast.makeText(this, "Logged In", Toast.LENGTH_SHORT).show()
                             val intent = Intent(this, HomeActivity::class.java)
+                            intent.putExtra("username", user.title)
                             startActivity(intent)
                         }
                 }
                 })
             }
+        }
+
+        // set logo
+        var inputStream: InputStream? = null
+        try {
+            inputStream = assets.open("free-logo.png")
+            val brew = Drawable.createFromStream(inputStream, null)
+            imageView_logo.setImageDrawable(brew)
+            inputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
