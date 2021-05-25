@@ -1,5 +1,6 @@
-package com.example.android.workoutbuddy
+package com.example.android.workoutbuddy.database
 
+import com.example.android.workoutbuddy.Picture
 import kotlinx.coroutines.flow.Flow
 
 class AppRepository (private val appDAO: AppDAO) {
@@ -34,9 +35,18 @@ class AppRepository (private val appDAO: AppDAO) {
         appDAO.insertPicture(picture)
     }
 
+//    suspend fun insertRecyclerInformation(recyclerInformation: RecyclerInformation){
+//        appDAO.insertRecyclerInformation(recyclerInformation)
+//    }
+
 //    suspend fun deleteById(id:Int){
 //        dreamDao.delete(id)
 //    }
+
+//    fun getRecyclerInformation(id:String): Flow<RecyclerInformation>{
+//        return appDAO.getRecyclerInformation(id)
+//    }
+
 
     fun getUser(username:String): Flow<User> {
         return appDAO.getUser(username)

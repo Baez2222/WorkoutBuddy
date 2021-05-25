@@ -1,4 +1,4 @@
-package com.example.android.workoutbuddy
+package com.example.android.workoutbuddy.database
 
 import android.app.Application
 

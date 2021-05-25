@@ -1,24 +1,21 @@
 package com.example.android.workoutbuddy
 
-import android.app.ActionBar
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.InputType
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.get
+import com.example.android.workoutbuddy.database.AppApplication
+import com.example.android.workoutbuddy.database.AppViewModel
+import com.example.android.workoutbuddy.database.AppViewModelFactory
+import com.example.android.workoutbuddy.database.Workout
 import com.example.android.workoutbuddy.databinding.ActivityCreateworkoutBinding
-import org.w3c.dom.Text
 import java.io.IOException
 import java.io.InputStream
-import java.util.*
 
 class CreateWorkoutActivity: AppCompatActivity() {
 

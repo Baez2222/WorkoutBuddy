@@ -10,6 +10,10 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import com.example.android.workoutbuddy.database.AppApplication
+import com.example.android.workoutbuddy.database.AppViewModel
+import com.example.android.workoutbuddy.database.AppViewModelFactory
+import com.example.android.workoutbuddy.database.User
 import com.example.android.workoutbuddy.databinding.ActivitySignupBinding
 import java.io.IOException
 import java.io.InputStream

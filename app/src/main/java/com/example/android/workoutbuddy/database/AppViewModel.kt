@@ -1,6 +1,7 @@
-package com.example.android.workoutbuddy
+package com.example.android.workoutbuddy.database
 
 import androidx.lifecycle.*
+import com.example.android.workoutbuddy.Picture
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
@@ -32,9 +33,18 @@ class AppViewModel (private val repository: AppRepository) : ViewModel() {
         repository.insertPicture(picture)
     }
 
+//    fun insertRecyclerInformation(recyclerInformation: RecyclerInformation) = viewModelScope.launch {
+//        repository.insertRecyclerInformation(recyclerInformation)
+//    }
+
+
 //    fun deleteById(id:Int) = viewModelScope.launch {
 //        repository.deleteById(id)
 //    }
+//    fun getRecyclerInformation(id:String): LiveData<RecyclerInformation>{
+//        return repository.getRecyclerInformation(id).asLiveData()
+//    }
+
 
     fun getUser(username:String) : LiveData<User> {
         return repository.getUser(username).asLiveData()

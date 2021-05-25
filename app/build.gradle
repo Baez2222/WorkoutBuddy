@@ -57,6 +57,7 @@ dependencies {
     def lifecycleVersion = '2.3.1'
     def coroutinesVersion = '1.3.9'
     def activityVersion = '1.1.0'
+    def fragment_version = "1.3.4"
 
     // room components
     implementation "androidx.room:room-ktx:$roomVersion"
@@ -78,5 +79,8 @@ dependencies {
 
     // dependency of linear time animation
     implementation 'com.github.krtkush:LinearTimer:v2.0.1'
+
+    // Kotlin
+    implementation "androidx.fragment:fragment-ktx:$fragment_version"
 
 }

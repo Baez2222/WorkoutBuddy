@@ -1,9 +1,10 @@
-package com.example.android.workoutbuddy
+package com.example.android.workoutbuddy.database
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.android.workoutbuddy.Picture
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,7 +22,7 @@ interface AppDAO {
 
     //Insert a dream; if there is conflict, we ignore the insert
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(user:User)
+    suspend fun insert(user: User)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWorkout(workout: Workout)
@@ -35,6 +36,9 @@ interface AppDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPicture(picture: Picture)
 
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    suspend fun insertRecyclerInformation(recyclerInformation: RecyclerInformation) // save recycler view state
+
     //Update a dream with a given id and a set of fields
 //    @Query("UPDATE dream_table SET title=:title, content=:content, reflection=:reflection, emotion=:emotion WHERE id=:id")
 //    suspend fun update(title:String, content:String, reflection:String, emotion:String, id:Int)
@@ -42,6 +46,10 @@ interface AppDAO {
     //Delete a dream with a given id
 //    @Query("DELETE FROM dream_table WHERE id=:id")
 //    suspend fun delete(id:Int)
+
+    // get recycler view state
+//    @Query("SELECT * FROM recycler_table where id=:id")
+//    fun getRecyclerInformation(id:String): Flow<RecyclerInformation>
 
     //Get a user with a given username
     @Query("SELECT * FROM user_table WHERE username=:username")

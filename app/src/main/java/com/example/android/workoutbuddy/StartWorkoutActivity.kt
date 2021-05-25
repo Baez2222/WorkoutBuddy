@@ -1,6 +1,5 @@
 package com.example.android.workoutbuddy
 
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.*
 import android.util.Log
@@ -9,15 +8,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.*
+import com.example.android.workoutbuddy.database.*
 import com.example.android.workoutbuddy.databinding.ActivityStartworkoutBinding
-import org.w3c.dom.Text
 import java.io.IOException
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
 
 class StartWorkoutActivity : AppCompatActivity(){
 
@@ -25,9 +24,22 @@ class StartWorkoutActivity : AppCompatActivity(){
     private lateinit var textView_workoutName: TextView
     private lateinit var recyclerView: RecyclerView
     private lateinit var button_finish: Button
-    private var currentState: Parcelable? = null
-    private var currentPersistent: Parcelable? = null
     private  lateinit var imageView_logo: ImageView
+
+
+    // vars for save instance
+    private val LIST_STATE = "list_state"
+    private var currentState: Parcelable? = null
+    private val BUNDLE_RECYCLER_LAYOUT = "recycler_layout"
+    private lateinit var workoutInstance : ArrayList<Workout>
+
+
+    private val KEY_RECYCLER_STATE: String = "recycler_state"
+    private var mBundleRecyclerViewState: Bundle? = null
+    private var mListState: Parcelable? = null
+
+
+
 
     private val appViewModel : AppViewModel by viewModels{
         AppViewModelFactory((application as AppApplication).repository)
@@ -35,6 +47,8 @@ class StartWorkoutActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
 
         binding = ActivityStartworkoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -45,6 +59,10 @@ class StartWorkoutActivity : AppCompatActivity(){
         button_finish = binding.buttonFinish
         imageView_logo = binding.imageView3
 
+        // set view model
+//        viewModel = ViewModelProvider(this).get(SavedStateViewModel::class.java)
+
+
         // current workout
         val workoutName = intent.getStringExtra("workout")
         val username = intent.getStringExtra("username")
@@ -54,9 +72,14 @@ class StartWorkoutActivity : AppCompatActivity(){
                 // recycler
                 val adapter = WorkoutAdapter(it)
                 recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+                recyclerView.layoutManager = LinearLayoutManager(
+                        this,
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                )
                 recyclerView.onFlingListener = null
                 recyclerView.setItemViewCacheSize(it.size)
+//                recyclerView.layoutManager?.onRestoreInstanceState(viewModel.getRVLayout())
                 // snap to each item on scroll
                 val snapHelper = PagerSnapHelper()
                 snapHelper.attachToRecyclerView(recyclerView)
@@ -71,14 +94,15 @@ class StartWorkoutActivity : AppCompatActivity(){
 //                fragmentTransaction.commit()
 
 
-
             })
         }
 
         button_finish.setOnClickListener {
             for ( i in 0 until recyclerView.childCount){
                 // current card
-                val currExercise = ((((recyclerView.getChildAt(0) as ConstraintLayout).getChildAt(2) as ScrollView).getChildAt(0) as CardView).getChildAt(0) as TableLayout)
+                val currExercise = ((((recyclerView.getChildAt(0) as ConstraintLayout).getChildAt(2) as ScrollView).getChildAt(
+                        0
+                ) as CardView).getChildAt(0) as TableLayout)
                 Log.println(Log.INFO, "child type", currExercise.javaClass.name)
 
                 // for each row of the card
@@ -88,7 +112,9 @@ class StartWorkoutActivity : AppCompatActivity(){
                     if (!checkBox.isEnabled && checkBox.isChecked){
                         // Exercise params
                         val workoutName = textView_workoutName.text.toString()
-                        val exerciseName = ((recyclerView.getChildAt(0) as ConstraintLayout).getChildAt(0) as TextView).text.toString()
+                        val exerciseName = ((recyclerView.getChildAt(0) as ConstraintLayout).getChildAt(
+                                0
+                        ) as TextView).text.toString()
 //                        val sets = currExercise.childCount - 1
                         var reps = 0
                         if ( (currRow.getChildAt(2) as EditText).text.isEmpty()){
@@ -107,9 +133,20 @@ class StartWorkoutActivity : AppCompatActivity(){
                         val currentDate = LocalDate.now()
                         val date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(currentDate)
 
-                        val exerciseInfo = Exercise(workoutName, exerciseName, reps, weight, date, username!!)
+                        val exerciseInfo = Exercise(
+                                workoutName,
+                                exerciseName,
+                                reps,
+                                weight,
+                                date,
+                                username!!
+                        )
                         appViewModel.insertExercise(exerciseInfo)
-                        Toast.makeText(this, workoutName + " " + exerciseName + " " + reps.toString() + " " + weight.toString() +" " + date +" " + username, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                                this,
+                                workoutName + " " + exerciseName + " " + reps.toString() + " " + weight.toString() + " " + date + " " + username,
+                                Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -129,38 +166,84 @@ class StartWorkoutActivity : AppCompatActivity(){
 
     }
 
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        currentState = recyclerView.layoutManager?.onSaveInstanceState()
-        outState.putParcelable("key", currentState)
+
+//    override fun onPause() {
+//        super.onPause()
+//        mBundleRecyclerViewState = Bundle()
+//        mListState = recyclerView.layoutManager?.onSaveInstanceState()
+//        mBundleRecyclerViewState?.putParcelable(KEY_RECYCLER_STATE, mListState)
+//    }
+
+    override fun onSaveInstanceState(state: Bundle) {
+        super.onSaveInstanceState(state)
+        // Save list state
+        mListState = recyclerView.layoutManager?.onSaveInstanceState()
+        state.putParcelable(KEY_RECYCLER_STATE, mListState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        if (!savedInstanceState.isEmpty){
-            currentState = savedInstanceState.getParcelable("key")
-        }
+        // Retrieve list state and list/item positions
+        mListState = savedInstanceState.getParcelable(KEY_RECYCLER_STATE)
     }
 
+    override fun onStop() {
+        super.onStop()
+        mBundleRecyclerViewState = Bundle()
+        mListState = recyclerView.layoutManager?.onSaveInstanceState()
+        mBundleRecyclerViewState?.putParcelable(KEY_RECYCLER_STATE, mListState)
+    }
+
+//    override fun onResume() {
+//        super.onResume()
+//            mListState = mBundleRecyclerViewState?.getParcelable(KEY_RECYCLER_STATE)
+//            recyclerView.layoutManager?.onRestoreInstanceState(mListState)
+//    }
     override fun onResume() {
         super.onResume()
-        if (currentState != null) {
-            recyclerView.layoutManager?.onRestoreInstanceState(currentState)
+        if (mListState != null) {
+            recyclerView.layoutManager?.onRestoreInstanceState(mListState)
         }
+}
+
+    override fun onRestart() {
+        super.onRestart()
+
+        if (mListState != null) {
+            recyclerView.layoutManager?.onRestoreInstanceState(mListState)
+        }
+//        mListState = mBundleRecyclerViewState!!.getParcelable(KEY_RECYCLER_STATE)
+//        recyclerView.layoutManager?.onRestoreInstanceState(mListState)
+//        Handler(Looper.myLooper()!!).postDelayed({
+//        }, 50)
     }
 
-//    override fun onStop() {
-////        super.onStop()
-////        bindService(Intent(this, VibrateService::class.java), )
-////        val notificationIntent = Intent(this, VibrateService::class.java)
-////        val pendingIntent = PendingIntent.getActivity(this, 0,
-////                notificationIntent, 0)
-////        val notification: Notification = NotificationCompat.Builder(this, "CHANNEL_ID")
-////                .setSmallIcon(R.drawable.ic_launcher_background)
-////                .setContentText("running in background")
-////                .setContentIntent(pendingIntent).build()
+
+
+//    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+//        super.onSaveInstanceState(outState, outPersistentState)
+//        outState.putParcelableArrayList(LIST_STATE, workoutInstance)
+//        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.layoutManager?.onSaveInstanceState())
 //
-////        startForegroundService(notificationIntent)
+////        currentState = recyclerView.layoutManager?.onSaveInstanceState()
+////        outState.putParcelable("key", currentState)
+////        outState.putString("workoutName", textView_workoutName.text.toString())
 //    }
+//
+//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+//        super.onRestoreInstanceState(savedInstanceState)
+//        if (!savedInstanceState.isEmpty){
+//            currentState = savedInstanceState.getParcelable("key")
+//            textView_workoutName.text = savedInstanceState.getString("workoutName")
+//        }
+//    }
+//
+//    override fun onResume() {
+//        super.onResume()
+//        recyclerView.layoutManager?.onRestoreInstanceState(currentState!!)
+//
+////        recyclerView.layoutManager?.onRestoreInstanceState(appViewModel.getRecyclerInformation("RVLM").value?.layout)
+//    }
+
 
 }

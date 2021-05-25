@@ -2,7 +2,6 @@ package com.example.android.workoutbuddy
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.media.Image
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
@@ -11,6 +10,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
+import com.example.android.workoutbuddy.database.AppApplication
+import com.example.android.workoutbuddy.database.AppViewModel
+import com.example.android.workoutbuddy.database.AppViewModelFactory
 import com.example.android.workoutbuddy.databinding.ActivityCalorietrackerBinding
 import java.io.IOException
 import java.io.InputStream
