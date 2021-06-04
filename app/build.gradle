@@ -83,4 +83,10 @@ dependencies {
     // Kotlin
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
 
+    // gson
+    implementation 'com.google.code.gson:gson:2.8.7'
+
+    // restore scroll position
+    implementation "androidx.recyclerview:recyclerview:1.2.0-alpha02"
+
 }

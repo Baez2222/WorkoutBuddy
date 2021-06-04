@@ -1,5 +1,8 @@
 package com.example.android.workoutbuddy
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.*
 import android.util.Log
@@ -12,8 +15,11 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.*
 import com.example.android.workoutbuddy.database.*
 import com.example.android.workoutbuddy.databinding.ActivityStartworkoutBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.io.IOException
 import java.io.InputStream
+import java.lang.reflect.Type
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -24,7 +30,10 @@ class StartWorkoutActivity : AppCompatActivity(){
     private lateinit var textView_workoutName: TextView
     private lateinit var recyclerView: RecyclerView
     private lateinit var button_finish: Button
-    private  lateinit var imageView_logo: ImageView
+    private lateinit var imageView_logo: ImageView
+
+    private lateinit var username: String
+    private lateinit var workoutName: String
 
 
     // vars for save instance
@@ -49,7 +58,6 @@ class StartWorkoutActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
 
 
-
         binding = ActivityStartworkoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -64,38 +72,28 @@ class StartWorkoutActivity : AppCompatActivity(){
 
 
         // current workout
-        val workoutName = intent.getStringExtra("workout")
-        val username = intent.getStringExtra("username")
+        workoutName = intent.getStringExtra("workout").toString()
+        username = intent.getStringExtra("username").toString()
         // get list of exercises in that workout
-        if (username != null && workoutName != null) {
-            appViewModel.getWorkoutByWorkoutName(username, workoutName).observe(this, Observer {
-                // recycler
-                val adapter = WorkoutAdapter(it)
-                recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(
-                        this,
-                        LinearLayoutManager.HORIZONTAL,
-                        false
-                )
-                recyclerView.onFlingListener = null
-                recyclerView.setItemViewCacheSize(it.size)
+
+        appViewModel.getWorkoutByWorkoutName(username, workoutName).observe(this, Observer {
+            // recycler
+            val adapter = WorkoutAdapter(it, appViewModel)
+            adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            recyclerView.adapter = adapter
+            recyclerView.isSaveEnabled = true
+            recyclerView.layoutManager = LinearLayoutManager(
+                    this,
+                    LinearLayoutManager.HORIZONTAL,
+                    false
+            )
+            recyclerView.onFlingListener = null
+            recyclerView.setItemViewCacheSize(it.size)
 //                recyclerView.layoutManager?.onRestoreInstanceState(viewModel.getRVLayout())
-                // snap to each item on scroll
-                val snapHelper = PagerSnapHelper()
-                snapHelper.attachToRecyclerView(recyclerView)
-
-//                val fragmentManager = supportFragmentManager
-//                // create a fragment transaction to begin the transaction and replace the fragment
-//                // create a fragment transaction to begin the transaction and replace the fragment
-//                val fragmentTransaction = fragmentManager.beginTransaction()
-//                //replacing the placeholder - fragmentContainterView with the fragment that is passed as parameter
-//                //replacing the placeholder - fragmentContainterView with the fragment that is passed as parameter
-//                fragmentTransaction.replace(R.id.fragContainer, WorkoutFragment())
-//                fragmentTransaction.commit()
-
-
-            })
-        }
+            // snap to each item on scroll
+            val snapHelper = PagerSnapHelper()
+            snapHelper.attachToRecyclerView(recyclerView)
+        })
 
         button_finish.setOnClickListener {
             for ( i in 0 until recyclerView.childCount){
@@ -139,7 +137,7 @@ class StartWorkoutActivity : AppCompatActivity(){
                                 reps,
                                 weight,
                                 date,
-                                username!!
+                                username
                         )
                         appViewModel.insertExercise(exerciseInfo)
                         Toast.makeText(
@@ -167,12 +165,8 @@ class StartWorkoutActivity : AppCompatActivity(){
     }
 
 
-//    override fun onPause() {
-//        super.onPause()
-//        mBundleRecyclerViewState = Bundle()
-//        mListState = recyclerView.layoutManager?.onSaveInstanceState()
-//        mBundleRecyclerViewState?.putParcelable(KEY_RECYCLER_STATE, mListState)
-//    }
+
+
 
     override fun onSaveInstanceState(state: Bundle) {
         super.onSaveInstanceState(state)
@@ -192,19 +186,77 @@ class StartWorkoutActivity : AppCompatActivity(){
         mBundleRecyclerViewState = Bundle()
         mListState = recyclerView.layoutManager?.onSaveInstanceState()
         mBundleRecyclerViewState?.putParcelable(KEY_RECYCLER_STATE, mListState)
+
+
+        // update checkbox state
+        val workoutName = textView_workoutName.text.toString()
+        for ( i in 0 until recyclerView.childCount){
+            // current card
+            val currExercise = ((((recyclerView.getChildAt(0) as ConstraintLayout).getChildAt(2) as ScrollView).getChildAt(
+                    0
+            ) as CardView).getChildAt(0) as TableLayout)
+
+            val exerciseName = ((recyclerView.getChildAt(0) as ConstraintLayout).getChildAt(
+                    0
+            ) as TextView).text.toString()
+
+            // for each row of the card
+            var checkBoxState = IntArray(currExercise.childCount - 1)
+            for (j in 1 until currExercise.childCount){
+
+                var currRow = currExercise.getChildAt(j) as TableRow
+                var checkBox = currRow.getChildAt(3) as CheckBox
+                if (!checkBox.isEnabled && checkBox.isChecked){
+                    checkBoxState[j - 1] = 1
+                }
+                else if(checkBox.isEnabled && checkBox.isChecked){
+                    checkBoxState[j - 1] = 2
+                }
+            }
+            val gson = Gson()
+            appViewModel.updateCheckBoxState(gson.toJson(checkBoxState), username, exerciseName, workoutName)
+        }
     }
 
-//    override fun onResume() {
-//        super.onResume()
-//            mListState = mBundleRecyclerViewState?.getParcelable(KEY_RECYCLER_STATE)
-//            recyclerView.layoutManager?.onRestoreInstanceState(mListState)
-//    }
-    override fun onResume() {
-        super.onResume()
-        if (mListState != null) {
-            recyclerView.layoutManager?.onRestoreInstanceState(mListState)
+
+    override fun onPause() {
+        super.onPause()
+
+        mBundleRecyclerViewState = Bundle()
+        mListState = recyclerView.layoutManager?.onSaveInstanceState()
+        mBundleRecyclerViewState?.putParcelable(KEY_RECYCLER_STATE, mListState)
+
+
+        // update checkbox state
+        val workoutName = textView_workoutName.text.toString()
+        for ( i in 0 until recyclerView.childCount){
+            // current card
+            val currExercise = ((((recyclerView.getChildAt(0) as ConstraintLayout).getChildAt(2) as ScrollView).getChildAt(
+                    0
+            ) as CardView).getChildAt(0) as TableLayout)
+
+            val exerciseName = ((recyclerView.getChildAt(0) as ConstraintLayout).getChildAt(
+                    0
+            ) as TextView).text.toString()
+
+            // for each row of the card
+            var checkBoxState = IntArray(currExercise.childCount - 1)
+            for (j in 1 until currExercise.childCount){
+
+                var currRow = currExercise.getChildAt(j) as TableRow
+                var checkBox = currRow.getChildAt(3) as CheckBox
+                if (!checkBox.isEnabled && checkBox.isChecked){
+                    checkBoxState[j - 1] = 1
+                }
+                else if(checkBox.isEnabled && checkBox.isChecked){
+                    checkBoxState[j - 1] = 2
+                }
+            }
+            val gson = Gson()
+            appViewModel.updateCheckBoxState(gson.toJson(checkBoxState), username, exerciseName, workoutName)
         }
-}
+    }
+
 
     override fun onRestart() {
         super.onRestart()
@@ -212,38 +264,14 @@ class StartWorkoutActivity : AppCompatActivity(){
         if (mListState != null) {
             recyclerView.layoutManager?.onRestoreInstanceState(mListState)
         }
-//        mListState = mBundleRecyclerViewState!!.getParcelable(KEY_RECYCLER_STATE)
-//        recyclerView.layoutManager?.onRestoreInstanceState(mListState)
-//        Handler(Looper.myLooper()!!).postDelayed({
-//        }, 50)
     }
 
-
-
-//    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-//        super.onSaveInstanceState(outState, outPersistentState)
-//        outState.putParcelableArrayList(LIST_STATE, workoutInstance)
-//        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.layoutManager?.onSaveInstanceState())
-//
-////        currentState = recyclerView.layoutManager?.onSaveInstanceState()
-////        outState.putParcelable("key", currentState)
-////        outState.putString("workoutName", textView_workoutName.text.toString())
-//    }
-//
-//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-//        super.onRestoreInstanceState(savedInstanceState)
-//        if (!savedInstanceState.isEmpty){
-//            currentState = savedInstanceState.getParcelable("key")
-//            textView_workoutName.text = savedInstanceState.getString("workoutName")
-//        }
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        recyclerView.layoutManager?.onRestoreInstanceState(currentState!!)
-//
-////        recyclerView.layoutManager?.onRestoreInstanceState(appViewModel.getRecyclerInformation("RVLM").value?.layout)
-//    }
+    override fun onResume() {
+        super.onResume()
+        if (mListState != null) {
+            recyclerView.layoutManager?.onRestoreInstanceState(mListState)
+        }
+    }
 
 
 }

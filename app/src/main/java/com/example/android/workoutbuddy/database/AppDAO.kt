@@ -71,6 +71,14 @@ interface AppDAO {
     @Query("SELECT COUNT(*) FROM exercise_table WHERE username=:username AND date=:date AND exercise=:exercise")
     fun getExerciseSetCount(username: String, date: String, exercise: String): Flow<Int>
 
+    // update checkboxstate
+    @Query("UPDATE workout_table SET checkboxState=:checkboxState WHERE username=:username AND exercise=:exercise AND workout=:workout")
+    suspend fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String)
+
+    // update timeLeft
+    @Query("UPDATE workout_table SET timeLeft=:timeLeft WHERE username=:username AND exercise=:exercise AND workout=:workout")
+    suspend fun updateTimeLeft(timeLeft: Long, username: String, exercise: String, workout: String)
+
 //    @Query("SELECT * FROM workout_table WHERE date=:date")
 //    fun getWorkoutByDate(date: String) : Flow<Workout>
 

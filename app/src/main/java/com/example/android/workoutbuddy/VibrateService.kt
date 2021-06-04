@@ -8,10 +8,18 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.util.concurrent.TimeUnit
 
 
 class VibrateService: Service(){
+
+//    private val tickIntent = Intent(ACTION_TICK)
+//
+//    private val finishedIntent = Intent(ACTION_FINISHED)
+//
+//    private lateinit var timer: CountDownTimer
+
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
@@ -19,6 +27,9 @@ class VibrateService: Service(){
     private val CHANNEL_ID = "ForegroundService Kotlin"
 
     companion object {
+
+//        const val ACTION_TICK: String = "your.pkg.name.ACTION_TICK"
+//        const val ACTION_FINISHED: String = "your.pkg.name.ACTION_FINISHED"
 
         fun startService(context: Context, message: String) {
             val startIntent = Intent(context, VibrateService::class.java)
@@ -35,6 +46,7 @@ class VibrateService: Service(){
             context.stopService(stopIntent)
         }
     }
+
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
@@ -63,12 +75,17 @@ class VibrateService: Service(){
 //                .build()
 //        startForeground(1, notification)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Foreground Service Kotlin Example")
+                .setContentTitle("Rest Timer Foreground Service")
                 .setContentText(input)
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentIntent(pendingIntent)
                 .build()
         startForeground(1, notification)
+
+
+
+//        val timer = CounterClass(90000, 1000, this@VibrateService)
+//        timer.start()
 
         return START_NOT_STICKY
     }
@@ -81,6 +98,50 @@ class VibrateService: Service(){
             manager!!.createNotificationChannel(serviceChannel)
         }
     }
+
+
+    class CounterClass(millisInFuture: Long, countDownInterval: Long, context_: Context) : CountDownTimer(millisInFuture, countDownInterval) {
+        private val context = context_
+
+        override fun onTick(millisUntilFinished: Long) {
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished)%60
+            var time = ""
+            if (seconds < 10){
+                time = "00:0" + seconds.toString()
+            }
+            else{
+                time = "$minutes:$seconds"
+            }
+
+
+            val timerInfoIntent = Intent("TIME_INFO")
+            timerInfoIntent.putExtra("VALUE", time)
+            LocalBroadcastManager.getInstance(context).sendBroadcast(timerInfoIntent)
+        }
+
+        override fun onFinish() {
+            val timerInfoIntent = Intent("TIME_INFO")
+            timerInfoIntent.putExtra("VALUE", "Completed")
+            LocalBroadcastManager.getInstance(context).sendBroadcast(timerInfoIntent)
+        }
+    }
+
+
+//    private fun createTimer(COUNTDOWN_LENGTH: Long): CountDownTimer =
+//        object : CountDownTimer(COUNTDOWN_LENGTH, 1000) {
+//            override fun onTick(millisUntilFinished: Long) {
+//                tickIntent.putExtra("timeLeft", millisUntilFinished)
+//                sendBroadcast(tickIntent)
+//            }
+//
+//            override fun onFinish() {
+//                sendBroadcast(finishedIntent)
+//                stopSelf() // Stop the service within itself NOT the activity
+//            }
+//        }
+
+
 
 }
 //class VibrateService: Service() {

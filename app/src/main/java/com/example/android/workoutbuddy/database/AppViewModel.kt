@@ -66,6 +66,14 @@ class AppViewModel (private val repository: AppRepository) : ViewModel() {
         return repository.getExerciseSetCount(username, date, exercise).asLiveData()
     }
 
+    fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String) = viewModelScope.launch {
+        repository.updateCheckBoxState(checkboxState, username, exercise, workout)
+    }
+
+    fun updateTimeLeft(timeLeft: Long, username: String, exercise: String, workout: String) = viewModelScope.launch {
+        repository.updateTimeLeft(timeLeft, username, exercise, workout)
+    }
+
 //    fun getWorkoutByName(date: String) : LiveData<Workout>{
 //        return repository.getWorkoutByDate(date).asLiveData()
 //    }

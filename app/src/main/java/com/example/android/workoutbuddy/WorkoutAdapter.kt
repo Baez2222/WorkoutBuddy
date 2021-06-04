@@ -1,24 +1,30 @@
 package com.example.android.workoutbuddy
 
+import android.R.attr.start
 import android.os.CountDownTimer
 import android.text.InputType
 import android.util.Log
-import android.util.SparseBooleanArray
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.workoutbuddy.database.AppViewModel
 import com.example.android.workoutbuddy.database.Workout
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
 
 
-class WorkoutAdapter(private val exercises: List<Workout>) : RecyclerView.Adapter<WorkoutAdapter.ViewHolder>() {
+class WorkoutAdapter(private val exercises: List<Workout>, private val appViewModel: AppViewModel) : RecyclerView.Adapter<WorkoutAdapter.ViewHolder>(){
 
     private lateinit var timer: CountDownTimer
-    private var restoreHolder : WorkoutAdapter.ViewHolder? = null
     private var pos = -1
+    lateinit var globalTime: TextView
+
+
 
     class ViewHolder(view: View): RecyclerView.ViewHolder(view){
         val textView_exerciseName : TextView = view.findViewById(R.id.textView_SWAexerciseName)
@@ -29,10 +35,6 @@ class WorkoutAdapter(private val exercises: List<Workout>) : RecyclerView.Adapte
 //                acquire()
 //            }
 //        }
-
-
-        var itemCheckBoxState = SparseBooleanArray()
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -48,10 +50,12 @@ class WorkoutAdapter(private val exercises: List<Workout>) : RecyclerView.Adapte
         val position = pos
 
 
-
-
-
-
+        val gson = Gson()
+        val type: Type = object : TypeToken<ArrayList<Int>>() {}.type
+        val checkboxState: ArrayList<Int> = gson.fromJson(
+                exercises[position].checkboxState,
+                type
+        )
 
 
         if(position != RecyclerView.NO_POSITION){
@@ -93,19 +97,20 @@ class WorkoutAdapter(private val exercises: List<Workout>) : RecyclerView.Adapte
                 tableRow.addView(editText_reps)
 
                 val checkBox_completed = CheckBox(holder.tableLayout.context)
-                checkBox_completed.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT).apply { gravity = Gravity.CENTER }
+                checkBox_completed.layoutParams = TableRow.LayoutParams(
+                        TableRow.LayoutParams.WRAP_CONTENT,
+                        TableRow.LayoutParams.WRAP_CONTENT
+                ).apply { gravity = Gravity.CENTER }
 
-                // check if checked or not
-                if(!holder.itemCheckBoxState.get((position.toString() + "00" + i.toString()).toInt(), false)){
-                    checkBox_completed.isChecked = false
-                    val key = (position.toString() + "00" + i.toString()).toInt()
-                    holder.itemCheckBoxState.put(key, false)
-                }
-                else{
-                    checkBox_completed.isChecked = true
-                    val key = (position.toString() + "00" + i.toString()).toInt()
-                    holder.itemCheckBoxState.put(key, true)
-                }
+                // check if set has already been completed
+                Log.println(Log.ERROR, "checkboxstate", checkboxState[i - 1].toString())
+                if (checkboxState[i - 1] == 0 && !checkBox_completed.isChecked){ checkBox_completed.isChecked = false }
+                else if (checkboxState[i - 1] == 0 && checkBox_completed.isChecked){ checkBox_completed.isChecked = true; checkBox_completed.isEnabled = true }
+                else if (checkboxState[i - 1] == 2){ checkBox_completed.isChecked = true }
+                else{ checkBox_completed.isChecked = true
+                checkBox_completed.isEnabled = false}
+
+
 
 
                 checkBox_completed.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -113,14 +118,14 @@ class WorkoutAdapter(private val exercises: List<Workout>) : RecyclerView.Adapte
                     Log.println(Log.INFO, "!!!!", "am inside click listener")
                     if (checkBox_completed.isChecked  && holder.time.text != ""){
                         checkBox_completed.isChecked = false
-                        val key = (position.toString() + "00" + i.toString()).toInt()
-                        holder.itemCheckBoxState.put(key, false)
                     }
                     else if ( checkBox_completed.isChecked && holder.time.text == ""){
-                        val key = (position.toString() + "00" + i.toString()).toInt()
-                        holder.itemCheckBoxState.put(key, true)
                         VibrateService.startService(holder.tableLayout.context, "Vibrate Foreground Service is running...") // start service
-                        timer = object: CountDownTimer(exercises[position].rest.toLong() * 1000, 1000){
+
+                        timer = object: CountDownTimer(
+                                exercises[position].rest.toLong() * 1000,
+                                1000
+                        ){
                             override fun onTick(p0: Long) {
                                 val minutes = TimeUnit.MILLISECONDS.toMinutes(p0)
                                 var seconds = TimeUnit.MILLISECONDS.toSeconds(p0)%60
@@ -137,20 +142,24 @@ class WorkoutAdapter(private val exercises: List<Workout>) : RecyclerView.Adapte
 //                            notificationManager.notify(100, builder.build())
 //                            val vibratorService = holder.tableLayout.context?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 //                            vibratorService.vibrate(VibrationEffect.createOneShot(2000, 150))
+                                checkboxState[i - 1] = 1
                                 holder.time.text = ""
                                 checkBox_completed.isEnabled = false
 //                            holder.wakeLock.acquire()
+//                                gson.toJson(checkboxState)
+//                                appViewModel.updateCheckBoxState(gson.toJson(checkboxState), exercises[position].username, exercises[position].exercise, exercises[position].workout)
                             }
 
                         }
                         timer.start()
+
+
                     }
                     else{
                         VibrateService.stopService(holder.tableLayout.context, false)
                         timer.cancel()
                         holder.time.text = ""
-                        val key = (position.toString() + "00" + i.toString()).toInt()
-                        holder.itemCheckBoxState.put(key, false)
+                        checkboxState[i - 1] = 0
                     }
 
                 }
@@ -174,6 +183,7 @@ class WorkoutAdapter(private val exercises: List<Workout>) : RecyclerView.Adapte
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        globalTime = holder.time
     }
 
     override fun getItemCount(): Int {

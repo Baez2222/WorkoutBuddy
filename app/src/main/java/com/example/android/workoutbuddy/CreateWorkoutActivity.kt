@@ -14,6 +14,7 @@ import com.example.android.workoutbuddy.database.AppViewModel
 import com.example.android.workoutbuddy.database.AppViewModelFactory
 import com.example.android.workoutbuddy.database.Workout
 import com.example.android.workoutbuddy.databinding.ActivityCreateworkoutBinding
+import com.google.gson.Gson
 import java.io.IOException
 import java.io.InputStream
 
@@ -100,7 +101,10 @@ class CreateWorkoutActivity: AppCompatActivity() {
         for ( i in 0..linearLayout.childCount){
             val currExercise = (linearLayout.getChildAt(i) as ConstraintLayout).getChildAt(0) as LinearLayout
             //Log.println(Log.ERROR, "composite key: ", editText_workoutName.toString() + " , " + username)
-            val workout = Workout(editText_workoutName.text.toString(), (currExercise.getChildAt(0) as EditText).text.toString(), (currExercise.getChildAt(1) as EditText).text.toString().toInt(), (currExercise.getChildAt(2) as EditText).text.toString().toInt(), (currExercise.getChildAt(3) as EditText).text.toString().toInt(), (currExercise.getChildAt(4) as EditText).text.toString().toInt(), username)
+            val gson = Gson()
+            val checkboxState = gson.toJson(IntArray((currExercise.getChildAt(2) as EditText).text.toString().toInt()))
+            Log.println(Log.DEBUG, "checkboxState", checkboxState)
+            val workout = Workout(editText_workoutName.text.toString(), (currExercise.getChildAt(0) as EditText).text.toString(), (currExercise.getChildAt(1) as EditText).text.toString().toInt(), (currExercise.getChildAt(2) as EditText).text.toString().toInt(), (currExercise.getChildAt(3) as EditText).text.toString().toInt(), (currExercise.getChildAt(4) as EditText).text.toString().toInt(), username, checkboxState, 0L)
             appViewModel.insertWorkout(workout)
         }
     }

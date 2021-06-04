@@ -67,6 +67,14 @@ class AppRepository (private val appDAO: AppDAO) {
     fun getExerciseSetCount(username: String, date: String, exercise: String): Flow<Int>{
         return appDAO.getExerciseSetCount(username, date, exercise)
     }
+
+    suspend fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String){
+        return appDAO.updateCheckBoxState(checkboxState, username, exercise, workout)
+    }
+
+    suspend fun updateTimeLeft(timeLeft: Long, username: String, exercise: String, workout: String){
+        return appDAO.updateTimeLeft(timeLeft, username, exercise, workout)
+    }
 //    fun getWorkoutByDate(date:String) : Flow<Workout>{
 //        return appDAO.getWorkoutByDate(date)
 //    }
