@@ -68,8 +68,19 @@ class AppRepository (private val appDAO: AppDAO) {
         return appDAO.getExerciseSetCount(username, date, exercise)
     }
 
-    suspend fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String){
-        return appDAO.updateCheckBoxState(checkboxState, username, exercise, workout)
+//    suspend fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String){
+//        return appDAO.updateCheckBoxState(checkboxState, username, exercise, workout)
+//    }
+    suspend fun insertCheckBoxState(checkboxState: CheckboxState){
+        appDAO.insertCheckboxState(checkboxState)
+    }
+
+    suspend fun updateCheckBoxState(checkboxState: String, username: String, workout: String){
+        return appDAO.updateCheckBoxState(checkboxState, username, workout)
+    }
+
+    fun getCheckBoxState(username: String, workout: String): Flow<CheckboxState>{
+        return appDAO.getCheckBoxState(username, workout)
     }
 
     suspend fun updateTimeLeft(timeLeft: Long, username: String, exercise: String, workout: String){
@@ -100,6 +111,16 @@ class AppRepository (private val appDAO: AppDAO) {
 
     fun getPicture(date: String, username: String): Flow<Picture>{
         return appDAO.getPicture(date, username)
+    }
+
+    val allCheckbox: Flow<List<Checkbox>> = appDAO.getAllCheckbox()
+
+    suspend fun insertCheckbox(checkbox: Checkbox){
+        appDAO.insertCheckbox(checkbox)
+    }
+
+    suspend fun updateCheckbox(currCheckbox: Int, checkboxId: Int){
+        return appDAO.updateCheckbox(currCheckbox, checkboxId)
     }
 
 }

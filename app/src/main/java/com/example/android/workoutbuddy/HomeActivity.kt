@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
 import android.widget.*
 import androidx.activity.viewModels
@@ -83,6 +84,7 @@ class HomeActivity: AppCompatActivity() {
             // query all workout names
             if (username != null) {
                 appViewModel.getWorkoutsByUsername(username).observe(this, Observer {
+                    Log.println(Log.ERROR, "list size", it.size.toString())
                     if (it.isEmpty()) {
                         val textView = TextView(this)
                         textView.layoutParams = LinearLayout.LayoutParams(
@@ -93,20 +95,22 @@ class HomeActivity: AppCompatActivity() {
                         llPopup.addView(textView)
                     } else {
                         for (element in it) {
-                            val button = Button(this)
-                            button.layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                            )
-                            button.text = element
-                            button.setOnClickListener {
-                                val intent = Intent(this, StartWorkoutActivity::class.java)
-                                intent.putExtra("username", username)
-                                intent.putExtra("workout", button.text.toString())
-                                popup.dismiss()
-                                startActivity(intent)
+                            if(llPopup.childCount < it.size){
+                                val button = Button(this)
+                                button.layoutParams = LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                )
+                                button.text = element
+                                button.setOnClickListener {
+                                    val intent = Intent(this, StartWorkoutActivity::class.java)
+                                    intent.putExtra("username", username)
+                                    intent.putExtra("workout", button.text.toString())
+                                    popup.dismiss()
+                                    startActivity(intent)
+                                }
+                                llPopup.addView(button)
                             }
-                            llPopup.addView(button)
                         }
                     }
                 })

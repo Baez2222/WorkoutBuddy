@@ -72,8 +72,18 @@ interface AppDAO {
     fun getExerciseSetCount(username: String, date: String, exercise: String): Flow<Int>
 
     // update checkboxstate
-    @Query("UPDATE workout_table SET checkboxState=:checkboxState WHERE username=:username AND exercise=:exercise AND workout=:workout")
-    suspend fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String)
+//    @Query("UPDATE workout_table SET checkboxState=:checkboxState WHERE username=:username AND exercise=:exercise AND workout=:workout")
+//    suspend fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String)
+
+    // insert checkboxstate
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCheckboxState(checkboxState: CheckboxState)
+    // update checkboxstate
+    @Query("UPDATE checkboxstate_table SET checkboxState=:checkboxState WHERE username=:username AND workout=:workout")
+    suspend fun updateCheckBoxState(checkboxState: String, username: String, workout: String)
+
+    @Query("SELECT * FROM checkboxstate_table WHERE username=:username AND workout=:workout")
+    fun getCheckBoxState(username: String, workout: String): Flow<CheckboxState>
 
     // update timeLeft
     @Query("UPDATE workout_table SET timeLeft=:timeLeft WHERE username=:username AND exercise=:exercise AND workout=:workout")
@@ -101,6 +111,18 @@ interface AppDAO {
     // get picture file path
     @Query("SELECT * FROM picture_table WHERE date=:date AND username=:username")
     fun getPicture(date: String, username: String) : Flow<Picture>
+
+    // get checkbox
+    @Query("SELECT * FROM checkbox_table")
+    fun getAllCheckbox() : Flow<List<Checkbox>>
+
+    // insert checkbox
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCheckbox(checkbox: Checkbox)
+
+    // set checkbox
+    @Query("UPDATE checkbox_table SET currCheckbox=:currCheckbox AND checkboxId=:checkboxId WHERE id=1")
+    fun updateCheckbox(currCheckbox: Int, checkboxId:Int)
 
 
 

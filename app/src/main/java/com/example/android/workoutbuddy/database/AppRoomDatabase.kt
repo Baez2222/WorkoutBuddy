@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.android.workoutbuddy.Picture
 
-@Database(entities = [User::class, Workout::class, Exercise::class, Food::class, Picture::class], version = 5, exportSchema = false)
+@Database(entities = [User::class, Workout::class, Exercise::class, Food::class, Picture::class, Checkbox::class, CheckboxState::class], version = 7, exportSchema = false)
 public abstract class AppRoomDatabase : RoomDatabase() {
     // connects with DAO
     abstract fun appDAO(): AppDAO // getter

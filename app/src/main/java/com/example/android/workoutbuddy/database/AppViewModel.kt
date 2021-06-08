@@ -66,8 +66,20 @@ class AppViewModel (private val repository: AppRepository) : ViewModel() {
         return repository.getExerciseSetCount(username, date, exercise).asLiveData()
     }
 
-    fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String) = viewModelScope.launch {
-        repository.updateCheckBoxState(checkboxState, username, exercise, workout)
+//    fun updateCheckBoxState(checkboxState: String, username: String, exercise: String, workout: String) = viewModelScope.launch {
+//        repository.updateCheckBoxState(checkboxState, username, exercise, workout)
+//    }
+
+    fun insertCheckBoxState(checkboxState: CheckboxState) = viewModelScope.launch {
+        repository.insertCheckBoxState(checkboxState)
+    }
+
+    fun updateCheckBoxState(checkboxState: String, username: String, workout: String) = viewModelScope.launch {
+        repository.updateCheckBoxState(checkboxState, username, workout)
+    }
+
+    fun getCheckBoxState(username: String, workout: String): LiveData<CheckboxState>{
+        return repository.getCheckBoxState(username, workout).asLiveData()
     }
 
     fun updateTimeLeft(timeLeft: Long, username: String, exercise: String, workout: String) = viewModelScope.launch {
@@ -96,6 +108,17 @@ class AppViewModel (private val repository: AppRepository) : ViewModel() {
 
     fun getPicture(date: String, username: String): LiveData<Picture>{
         return repository.getPicture(date, username).asLiveData()
+    }
+
+
+    val allCheckbox: LiveData<List<Checkbox>> = repository.allCheckbox.asLiveData()
+
+    fun insertCheckbox(checkbox: Checkbox) = viewModelScope.launch {
+        repository.insertCheckbox(checkbox)
+    }
+
+    fun updateCheckbox(currCheckbox: Int, checkboxId: Int) = viewModelScope.launch {
+        repository.updateCheckbox(currCheckbox, checkboxId)
     }
 
 //    fun update(id:Int, title:String, content:String, reflection:String, emotion:String) = viewModelScope.launch {

@@ -87,7 +87,7 @@ class VibrateService: Service(){
 //        val timer = CounterClass(90000, 1000, this@VibrateService)
 //        timer.start()
 
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     private fun createNotificationChannel() {
@@ -124,6 +124,7 @@ class VibrateService: Service(){
             val timerInfoIntent = Intent("TIME_INFO")
             timerInfoIntent.putExtra("VALUE", "Completed")
             LocalBroadcastManager.getInstance(context).sendBroadcast(timerInfoIntent)
+            stopService(context, true)
         }
     }
 
