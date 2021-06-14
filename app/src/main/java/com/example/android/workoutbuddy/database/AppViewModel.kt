@@ -78,6 +78,14 @@ class AppViewModel (private val repository: AppRepository) : ViewModel() {
         repository.updateCheckBoxState(checkboxState, username, workout)
     }
 
+    fun updateCheckBoxStateWeight(weightState: String, username: String, workout: String) = viewModelScope.launch {
+        repository.updateCheckBoxStateWeight(weightState, username, workout)
+    }
+
+    fun updateCheckBoxStateReps(repsState: String, username: String, workout: String) = viewModelScope.launch {
+        repository.updateCheckBoxStateReps(repsState, username, workout)
+    }
+
     fun getCheckBoxState(username: String, workout: String): LiveData<CheckboxState>{
         return repository.getCheckBoxState(username, workout).asLiveData()
     }
@@ -117,8 +125,8 @@ class AppViewModel (private val repository: AppRepository) : ViewModel() {
         repository.insertCheckbox(checkbox)
     }
 
-    fun updateCheckbox(currCheckbox: Int, checkboxId: Int) = viewModelScope.launch {
-        repository.updateCheckbox(currCheckbox, checkboxId)
+    fun updateCheckbox(currCheckbox: Int, timerHolderPosition: Int, tag:String) = viewModelScope.launch {
+        repository.updateCheckbox(currCheckbox, timerHolderPosition, tag)
     }
 
 //    fun update(id:Int, title:String, content:String, reflection:String, emotion:String) = viewModelScope.launch {

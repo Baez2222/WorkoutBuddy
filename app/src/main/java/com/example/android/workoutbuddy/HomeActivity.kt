@@ -12,10 +12,12 @@ import android.os.Environment
 import android.os.PowerManager
 import android.provider.MediaStore
 import android.util.Log
-import android.view.Gravity
+import android.view.*
+import android.view.View.*
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.solver.widgets.ConstraintWidgetContainer.measure
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import com.example.android.workoutbuddy.database.AppApplication
@@ -103,7 +105,7 @@ class HomeActivity: AppCompatActivity() {
                                 )
                                 button.text = element
                                 button.setOnClickListener {
-                                    val intent = Intent(this, StartWorkoutActivity::class.java)
+                                    val intent = Intent(this, StartWorkoutMainActivity::class.java)
                                     intent.putExtra("username", username)
                                     intent.putExtra("workout", button.text.toString())
                                     popup.dismiss()
@@ -138,8 +140,8 @@ class HomeActivity: AppCompatActivity() {
             val popup = PopupWindow(this)
             val view = layoutInflater.inflate(R.layout.popupcalendar, null)
             val dateView = view.findViewById<TextView>(R.id.textView_pcDate)
-            val workoutView = view.findViewById<TextView>(R.id.textView_pcWorkouts)
             val progressPic = view.findViewById<ImageView>(R.id.imageView_progressPicture)
+            val linearLayout = view.findViewById<LinearLayout>(R.id.linearLayout_calendarTable)
 
 
             val selectedDate = year.toString()+"-"+String.format("%02d", month + 1)+"-"+String.format(
@@ -148,20 +150,31 @@ class HomeActivity: AppCompatActivity() {
             )
             dateView.text = selectedDate
 
-            appViewModel.getWorkoutsByDate(username!!, selectedDate).observe(this, Observer {
-                if (it.isEmpty()) {
-                    workoutView.text = "No Workouts Recorded."
+            appViewModel.getWorkoutsByDate(username, selectedDate).observe(this, Observer {
+                if (it.isEmpty() || it == null) {
+                    val textViewWorkout = TextView(this)
+                    textViewWorkout.text = "No Workouts Recorded."
+                    textViewWorkout.gravity = Gravity.CENTER
+                    linearLayout.addView(textViewWorkout)
                 } else {
                     var previous: String? = null
                     for (i in it) {
                         if (i.workout != previous) {
-                            workoutView.text =
-                                workoutView.text.toString() + i.workout + "\n" + "Exercise: " + i.exercise + ", Reps: " + i.reps + ", Weight: " + i.weight + "\n"
+                            val textViewWorkout = TextView(this)
+                            textViewWorkout.text = i.workout
+                            textViewWorkout.gravity = Gravity.CENTER
+                            linearLayout.addView(textViewWorkout)
                             previous = i.workout
-                        } else {
-                            workoutView.text =
-                                workoutView.text.toString() + "Exercise: " + i.exercise + ", Reps: " + i.reps + ", Weight: " + i.weight + "\n"
                         }
+                        val inflater = LayoutInflater.from(applicationContext)
+                        val tableRow = inflater.inflate(R.layout.calendartablerow, null)
+                        val exerciseName = tableRow.findViewById<TextView>(R.id.textView_calendarRowExercise)
+                        val weight = tableRow.findViewById<TextView>(R.id.textView_calendarRowWeight)
+                        val reps = tableRow.findViewById<TextView>(R.id.textView_calendarRowReps)
+                        exerciseName.text = i.exercise
+                        weight.text = i.weight.toString()
+                        reps.text = i.reps.toString()
+                        linearLayout.addView(tableRow)
                     }
                 }
             })
@@ -178,6 +191,7 @@ class HomeActivity: AppCompatActivity() {
             popup.contentView = view
             popup.isOutsideTouchable = true
             popup.showAtLocation(view, Gravity.CENTER, 0, 0)
+            popup.update(750, 900)
             Toast.makeText(this, selectedDate, Toast.LENGTH_SHORT).show();
         }
 

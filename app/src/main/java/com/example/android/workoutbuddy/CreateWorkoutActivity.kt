@@ -9,10 +9,7 @@ import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.example.android.workoutbuddy.database.AppApplication
-import com.example.android.workoutbuddy.database.AppViewModel
-import com.example.android.workoutbuddy.database.AppViewModelFactory
-import com.example.android.workoutbuddy.database.Workout
+import com.example.android.workoutbuddy.database.*
 import com.example.android.workoutbuddy.databinding.ActivityCreateworkoutBinding
 import com.google.gson.Gson
 import java.io.IOException
@@ -48,8 +45,12 @@ class CreateWorkoutActivity: AppCompatActivity() {
         button_add.setOnClickListener {
             val inflater = LayoutInflater.from(applicationContext)
             val view= inflater.inflate(R.layout.exercise_item, null)
+            val deleteView: TextView = view.findViewById(R.id.right_view)
 //            val view = LayoutInflater.from(this).inflate(R.layout.exercise_item, null)
             linearLayout.addView(view, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+            deleteView.setOnClickListener {
+                linearLayout.removeView(view)
+            }
         }
 
         button_submit.setOnClickListener {
@@ -80,6 +81,7 @@ class CreateWorkoutActivity: AppCompatActivity() {
 
                 if (!foundEmpty){
                     addToDB()
+                    addCheckToDB()
                     finish()
                 }
             }
@@ -98,15 +100,29 @@ class CreateWorkoutActivity: AppCompatActivity() {
     }
 
     private fun addToDB(){
-        for ( i in 0..linearLayout.childCount){
+        var id = 0
+        for ( i in 0 until linearLayout.childCount){
             val currExercise = (linearLayout.getChildAt(i) as ConstraintLayout).getChildAt(0) as LinearLayout
-            //Log.println(Log.ERROR, "composite key: ", editText_workoutName.toString() + " , " + username)
-            val gson = Gson()
-            val checkboxState = gson.toJson(IntArray((currExercise.getChildAt(2) as EditText).text.toString().toInt()))
-            Log.println(Log.DEBUG, "checkboxState", checkboxState)
-            val workout = Workout(editText_workoutName.text.toString(), (currExercise.getChildAt(0) as EditText).text.toString(), (currExercise.getChildAt(1) as EditText).text.toString().toInt(), (currExercise.getChildAt(2) as EditText).text.toString().toInt(), (currExercise.getChildAt(3) as EditText).text.toString().toInt(), (currExercise.getChildAt(4) as EditText).text.toString().toInt(), username, checkboxState, 0L)
+            val workout = Workout(editText_workoutName.text.toString(), (currExercise.getChildAt(0) as EditText).text.toString(), (currExercise.getChildAt(1) as EditText).text.toString().toInt(), (currExercise.getChildAt(2) as EditText).text.toString().toInt(), (currExercise.getChildAt(3) as EditText).text.toString().toInt(), (currExercise.getChildAt(4) as EditText).text.toString().toInt(), username, 0L, id)
+            id += 1
             appViewModel.insertWorkout(workout)
         }
+    }
+
+    private fun addCheckToDB(){
+        var checkboxState: Array<IntArray> = arrayOf()
+        var weightState: Array<IntArray> = arrayOf()
+        var repsState: Array<IntArray> = arrayOf()
+        for(i in 0 until linearLayout.childCount){
+            val sets = (((linearLayout.getChildAt(i) as ConstraintLayout).getChildAt(0) as LinearLayout).getChildAt(1) as EditText).text.toString().toInt()
+            val weight = (((linearLayout.getChildAt(i) as ConstraintLayout).getChildAt(0) as LinearLayout).getChildAt(4) as EditText).text.toString().toInt()
+            val reps = (((linearLayout.getChildAt(i) as ConstraintLayout).getChildAt(0) as LinearLayout).getChildAt(2) as EditText).text.toString().toInt()
+            checkboxState += IntArray(sets)
+            weightState += IntArray(sets) { weight }
+            repsState += IntArray(sets) { reps }
+        }
+        Log.println(Log.ERROR, "checkbox state", Gson().toJson(checkboxState))
+        appViewModel.insertCheckBoxState(CheckboxState(username, editText_workoutName.text.toString(), Gson().toJson(checkboxState), Gson().toJson(weightState), Gson().toJson(repsState)))
     }
 
 }

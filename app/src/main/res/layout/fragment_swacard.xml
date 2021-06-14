@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView_SWAexerciseName"
+        android:id="@+id/textView_exerciseFragCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -17,42 +18,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--    <io.github.krtkush.lineartimer.LinearTimerView-->
-<!--        android:id="@+id/linearTimer"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_centerHorizontal="true"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:radius="20dp"-->
-<!--        app:strokeWidth="3dp">-->
-
-<!--    </io.github.krtkush.lineartimer.LinearTimerView>-->
 
     <ScrollView
+        android:id="@+id/scrollView3"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="64dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearTimer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_SWAexerciseName">
+        app:layout_constraintTop_toBottomOf="@+id/textView_exerciseFragCard">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
+            android:id="@+id/fargCardView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="32dp"
+            android:layout_marginEnd="16dp"
             android:background="@color/black"
             android:outlineAmbientShadowColor="@color/shadow"
             android:outlineSpotShadowColor="@color/shadow">
 
             <TableLayout
-                android:id="@+id/tableLayout_card"
+                android:id="@+id/tableLayout_fragCard"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/black"
@@ -64,7 +53,7 @@
                     android:background="@color/black">
 
                     <TextView
-                        android:id="@+id/textView_SWAset"
+                        android:id="@+id/textView_setsFragCard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -74,7 +63,7 @@
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:id="@+id/textView_SWAweight"
+                        android:id="@+id/textView_weightFragCard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -84,7 +73,7 @@
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:id="@+id/textView_SWAreps"
+                        android:id="@+id/textView_repsFragCard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -94,7 +83,7 @@
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:id="@+id/textView_SWAcompleted"
+                        android:id="@+id/textView_completedFragCard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -102,6 +91,7 @@
                         android:gravity="center"
                         android:text="Completed?"
                         android:textColor="@color/white" />
+
                 </TableRow>
 
             </TableLayout>
@@ -109,4 +99,30 @@
         </androidx.cardview.widget.CardView>
     </ScrollView>
 
+
+    <io.github.krtkush.lineartimer.LinearTimerView
+        android:id="@+id/linearTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView3"
+        app:radius="18dp"
+        app:strokeWidth="3dp" />
+
+    <TextView
+        android:id="@+id/textView_timerCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="00:00"
+        android:textColor="@color/white"
+        android:textColorHint="@color/shadow"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/linearTimer"
+        app:layout_constraintStart_toStartOf="@+id/linearTimer"
+        app:layout_constraintBottom_toBottomOf="@id/linearTimer"
+        app:layout_constraintTop_toTopOf="@id/linearTimer"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

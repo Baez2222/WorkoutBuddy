@@ -13,5 +13,5 @@ class Workout(@ColumnInfo(name="workout") val workout: String,
               @ColumnInfo(name="rest") val rest: Int,
               @ColumnInfo(name="weight") val weight: Int,
               @ColumnInfo(name="username") val username: String,
-              @ColumnInfo(name="checkboxState") val checkboxState: String,
-              @ColumnInfo(name="timeLeft") val timeLeft: Long)
+              @ColumnInfo(name="timeLeft") val timeLeft: Long,
+              @ColumnInfo(name="id") val id:Int)

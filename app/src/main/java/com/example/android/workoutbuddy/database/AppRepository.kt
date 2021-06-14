@@ -79,6 +79,14 @@ class AppRepository (private val appDAO: AppDAO) {
         return appDAO.updateCheckBoxState(checkboxState, username, workout)
     }
 
+    suspend fun updateCheckBoxStateWeight(weightState: String, username: String, workout: String){
+        return appDAO.updateCheckBoxStateWeight(weightState, username, workout)
+    }
+
+    suspend fun updateCheckBoxStateReps(repsState: String, username: String, workout: String){
+        return appDAO.updateCheckBoxStateReps(repsState, username, workout)
+    }
+
     fun getCheckBoxState(username: String, workout: String): Flow<CheckboxState>{
         return appDAO.getCheckBoxState(username, workout)
     }
@@ -119,8 +127,8 @@ class AppRepository (private val appDAO: AppDAO) {
         appDAO.insertCheckbox(checkbox)
     }
 
-    suspend fun updateCheckbox(currCheckbox: Int, checkboxId: Int){
-        return appDAO.updateCheckbox(currCheckbox, checkboxId)
+    suspend fun updateCheckbox(currCheckbox: Int, timerHolderPosition: Int, tag:String){
+        return appDAO.updateCheckbox(currCheckbox, timerHolderPosition, tag)
     }
 
 }

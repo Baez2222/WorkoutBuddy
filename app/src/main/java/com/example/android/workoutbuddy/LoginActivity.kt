@@ -46,15 +46,21 @@ class LoginActivity: AppCompatActivity() {
                 Toast.makeText(this, "Missing Fields", Toast.LENGTH_SHORT).show()
             }
             else{
-                appViewModel.getUser(editText_username.text.toString()).observe(this, Observer {
-                    user -> user?.let {
-                        if (user.title == editText_username.text.toString() && user.content == editText_password.text.toString().toInt()){
-                            Toast.makeText(this, "Logged In", Toast.LENGTH_SHORT).show()
-                            val intent = Intent(this, HomeActivity::class.java)
-                            intent.putExtra("username", user.title)
-                            startActivity(intent)
+                appViewModel.getUser(editText_username.text.toString()).observe(this, Observer { user ->
+//                    user -> user?.let {
+                    if(user == null){
+                        Toast.makeText(this, "Invalid Information Entered", Toast.LENGTH_SHORT).show()
+                    }
+                    else if (user.title == editText_username.text.toString() && user.content == editText_password.text.toString().toInt()){
+                        Toast.makeText(this, "Logged In", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, HomeActivity::class.java)
+                        intent.putExtra("username", user.title)
+                        startActivity(intent)
+                    }
+                    else{
+                        Toast.makeText(this, "Invalid Information Entered", Toast.LENGTH_SHORT).show()
                         }
-                }
+//                }
                 })
             }
         }

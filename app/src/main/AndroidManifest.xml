@@ -45,12 +45,10 @@
         <activity
             android:name=".CreateWorkoutActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".StartWorkoutActivity"
+        <activity android:name=".StartWorkoutMainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="portrait"
-            android:showWhenLocked="true"
-            android:windowSoftInputMode="stateHidden|adjustPan"/>
+            android:showWhenLocked="true"/>
         <activity
             android:name=".CalorieTrackerActivity"
             android:screenOrientation="portrait" />

@@ -34,9 +34,6 @@ class SimpleCountDownTimer(
     private var isBackgroundThreadRunning = false
     private val simpleDateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
     private val runnable = Runnable { decrementMinutes() }
-    private var currCheckbox: Int = -1
-    private var exerciseName: String = ""
-    private var holderPosition: Int = -1
 
     init {
         check(!(fromMinutes <= 0 && fromSeconds <= 0)) { javaClass.simpleName + " can't work in state 0:00" }
@@ -162,10 +159,7 @@ class SimpleCountDownTimer(
      *
      * @param resume if true it will resume from where its paused else from start.
      */
-    fun start(resume: Boolean = false, currCheckbox: Int, exerciseName: String, holderPosition: Int) {
-        this.currCheckbox = currCheckbox
-        this.exerciseName = exerciseName
-        this.holderPosition = holderPosition
+    fun start(resume: Boolean = false) {
         if (!resume) {
 //            onCountDownListener.updateViewModel()
             setCountDownValues()
@@ -202,27 +196,6 @@ class SimpleCountDownTimer(
     }
 
     /**
-     * A method to get current checkbox index
-     */
-    fun getCurrCheckbox(): Int{
-        return this.currCheckbox
-    }
-
-    /**
-     * A method to get exercise name
-     */
-    fun getExerciseName(): String{
-        return this.exerciseName
-    }
-
-    /**
-     * A method to get holderPosition
-     */
-    fun getHolderPosition(): Int{
-        return this.holderPosition
-    }
-
-    /**
      * A countdown listener to be used to listen for ticks and finish.
      */
     interface OnCountDownListener {
@@ -235,7 +208,5 @@ class SimpleCountDownTimer(
          * A method called once when countdown is finished.
          */
         fun onCountDownFinished(cancel: Boolean)
-
-        fun updateViewModel()
     }
 }

@@ -60,7 +60,7 @@ interface AppDAO {
     fun getWorkoutsByUsername(username: String) : Flow<List<String>>
 
     // Get workout of user by workout name
-    @Query("SELECT * FROM workout_table WHERE username=:username AND workout=:workout")
+    @Query("SELECT * FROM workout_table WHERE username=:username AND workout=:workout ORDER BY id ASC")
     fun getWorkoutByWorkoutName(username: String, workout: String) : Flow<List<Workout>>
 
     // Get workout/exercise by date
@@ -81,6 +81,12 @@ interface AppDAO {
     // update checkboxstate
     @Query("UPDATE checkboxstate_table SET checkboxState=:checkboxState WHERE username=:username AND workout=:workout")
     suspend fun updateCheckBoxState(checkboxState: String, username: String, workout: String)
+
+    @Query("UPDATE checkboxstate_table SET weightState=:weightState WHERE username=:username AND workout=:workout")
+    suspend fun updateCheckBoxStateWeight(weightState: String, username: String, workout: String)
+
+    @Query("UPDATE checkboxstate_table SET repsState=:repsState WHERE username=:username AND workout=:workout")
+    suspend fun updateCheckBoxStateReps(repsState: String, username: String, workout: String)
 
     @Query("SELECT * FROM checkboxstate_table WHERE username=:username AND workout=:workout")
     fun getCheckBoxState(username: String, workout: String): Flow<CheckboxState>
@@ -121,8 +127,8 @@ interface AppDAO {
     suspend fun insertCheckbox(checkbox: Checkbox)
 
     // set checkbox
-    @Query("UPDATE checkbox_table SET currCheckbox=:currCheckbox AND checkboxId=:checkboxId WHERE id=1")
-    fun updateCheckbox(currCheckbox: Int, checkboxId:Int)
+    @Query("UPDATE checkbox_table SET currCheckbox=:currCheckbox AND timerHolderPosition=:timerHolderPosition AND tag=:tag WHERE id=1")
+    fun updateCheckbox(currCheckbox: Int, timerHolderPosition:Int, tag:String)
 
 
 
