@@ -68,7 +68,13 @@ class CalorieTrackerActivity: AppCompatActivity() {
         editText_daily.addTextChangedListener {
             // update consumed and remainder textviews
             textView_consumed.text = consumed.toString()
-            daily = it.toString().toInt() - textView_consumed.text.toString().toInt()
+            if(it!!.isNotEmpty()){
+                daily = it.toString().toInt()
+            }
+            else{
+                daily = 0
+            }
+            daily -= textView_consumed.text.toString().toInt()
             textView_remainder.text = daily.toString()
         }
 
