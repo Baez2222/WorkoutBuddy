@@ -84,7 +84,21 @@ class StartWorkoutMainActivity: AppCompatActivity() {
                         val date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now())
                         for(i in checkboxState.indices){
                             for(j in checkboxState[i].indices){
-                                appViewModel.insertExercise(Exercise(workoutName, workoutList[i].exercise, repsState[i][j], weightState[i][j], date, username))
+                                if(checkboxState[i][j] != 0){
+                                    val reps = if(repsState[i][j] != 0){
+                                        repsState[i][j]
+                                    } else {
+                                        workoutList[i].reps
+                                    }
+
+                                    val weight = if(weightState[i][j] != 0){
+                                        weightState[i][j]
+                                    } else {
+                                        workoutList[i].weight
+                                    }
+
+                                    appViewModel.insertExercise(Exercise(workoutName, workoutList[i].exercise, reps, weight, date, username))
+                                }
                             }
                         }
                         resetCheckboxState()

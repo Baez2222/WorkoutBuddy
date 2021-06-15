@@ -176,11 +176,9 @@ class FragmentCard: Fragment(), SimpleCountDownTimer.OnCountDownListener {
 
 
             checkboxCompleted.setOnCheckedChangeListener { buttonView, isChecked ->
-//                Log.println(Log.ERROR, "current checkboxState", Gson().toJson(checkboxState))
 
                 val minutes = TimeUnit.MILLISECONDS.toMinutes(rest.toLong() * 1000)
                 val seconds = TimeUnit.MILLISECONDS.toSeconds(rest.toLong() * 1000)%60
-//                Log.println(Log.ERROR, "currCheckbox", currCheckbox.toString())
 
                 // prevents another checkbox from checked while a timer is running
                 if (isChecked  && textView_Timer.text != ""){
@@ -193,18 +191,15 @@ class FragmentCard: Fragment(), SimpleCountDownTimer.OnCountDownListener {
                     simpleCountDownTimer.cancel()
                     linearTimer.restartTimer()
                     linearTimer.pauseTimer()
-//                        simpleCountDownTimer.cancel()
                     currentCheckbox = -1
                     checkboxCompleted.text = ""
                     appViewModel.insertCheckbox(Checkbox(currentCheckbox, -1, "CardFragment", exercise, workoutName, 1))
                 }
                 // start rest timer on check
-                else if ( isChecked && textView_Timer.text == "" && currentCheckbox == -1){
+                else if ( (isChecked && textView_Timer.text == "" && currentCheckbox == -1) || (isChecked && textView_Timer.text == "" && currentCheckbox != -1 && !VibrateService.isRunning()) ){
                     currentCheckboxState[i - 1] = 1
                     currentCheckbox = i-1
 
-
-                    Log.println(Log.ERROR, "inside second else if", currentCheckbox.toString())
                     VibrateService.startService(requireContext(), "Vibrate Foreground Service is running...") // start service
                     simpleCountDownTimer = SimpleCountDownTimer(minutes, seconds, this)
                     simpleCountDownTimer.start(false)

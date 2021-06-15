@@ -39,7 +39,7 @@ class VibrateService: Service(){
         fun stopService(context: Context, shouldVibrate: Boolean) {
             if(shouldVibrate){
                 val vibratorService = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                vibratorService.vibrate(VibrationEffect.createOneShot(1000, 150))
+                vibratorService.vibrate(VibrationEffect.createOneShot(1250, 175))
             }
 
             val stopIntent = Intent(context, VibrateService::class.java)

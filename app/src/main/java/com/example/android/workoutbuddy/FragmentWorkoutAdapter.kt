@@ -95,8 +95,13 @@ class FragmentWorkoutAdapter(private val exercises: List<Workout>, private val a
             edittextWeight.setBackgroundColor(Color.BLACK)
             edittextWeight.setTextColor(Color.WHITE)
             edittextWeight.setHintTextColor(Color.LTGRAY)
-            edittextWeight.hint = weightState[position][i-1].toString()
             tableRow.addView(edittextWeight)
+            if(weightState[position][i-1] != 0){
+                edittextWeight.text = weightState[position][i-1].toString()
+            }
+            else{
+                edittextWeight.hint = exercises[position].weight.toString()
+            }
 
             val edittextReps = TextView(holder.tableLayout.context)
             edittextReps.inputType = InputType.TYPE_CLASS_NUMBER
@@ -109,8 +114,13 @@ class FragmentWorkoutAdapter(private val exercises: List<Workout>, private val a
             edittextReps.setBackgroundColor(Color.BLACK)
             edittextReps.setTextColor(Color.WHITE)
             edittextReps.setHintTextColor(Color.LTGRAY)
-            edittextReps.hint = repsState[position][i-1].toString()
             tableRow.addView(edittextReps)
+            if(repsState[position][i-1] != 0){
+                edittextReps.text = repsState[position][i-1].toString()
+            }
+            else{
+                edittextReps.hint = exercises[position].reps.toString()
+            }
 
             val checkboxCompleted = AppCompatCheckBox(holder.tableLayout.context)
             checkboxCompleted.layoutParams = TableRow.LayoutParams(

@@ -1,6 +1,7 @@
 package com.example.android.workoutbuddy
 
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -15,6 +16,8 @@ import com.example.android.workoutbuddy.databinding.ActivityUpdateworkoutBinding
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zerobranch.layout.SwipeLayout
+import java.io.IOException
+import java.io.InputStream
 import java.lang.reflect.Type
 
 class UpdateWorkoutActivity: AppCompatActivity() {
@@ -24,6 +27,7 @@ class UpdateWorkoutActivity: AppCompatActivity() {
     private lateinit var buttonAdd: Button
     private lateinit var workoutNameText: EditText
     private lateinit var linearLayout: LinearLayout
+    private lateinit var imageView: ImageView
 
     private lateinit var username: String
     private lateinit var workoutName: String
@@ -43,6 +47,7 @@ class UpdateWorkoutActivity: AppCompatActivity() {
         buttonAdd = binding.buttonAddExercise2
         workoutNameText = binding.editTextWorkoutName2
         linearLayout = binding.linearLayoutExercises2
+        imageView = binding.imageView5
 
         username = intent.getStringExtra("username").toString()
         workoutName = intent.getStringExtra("workout").toString()
@@ -51,6 +56,19 @@ class UpdateWorkoutActivity: AppCompatActivity() {
         workoutNameText.setText(workoutName)
         workoutNameText.isFocusable = false
         workoutNameText.setTextColor(Color.GRAY)
+
+
+        // set logo
+        var inputStream: InputStream? = null
+        try {
+            inputStream = assets.open("free-logo.png")
+            val brew = Drawable.createFromStream(inputStream, null)
+            imageView.setImageDrawable(brew)
+            inputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
 
         buttonAdd.setOnClickListener {
             val inflater = LayoutInflater.from(applicationContext)
