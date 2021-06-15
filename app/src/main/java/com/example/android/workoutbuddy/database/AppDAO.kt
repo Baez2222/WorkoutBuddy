@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.android.workoutbuddy.Picture
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,7 +23,7 @@ interface AppDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: User)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkout(workout: Workout)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -46,6 +45,18 @@ interface AppDAO {
     //Delete a dream with a given id
 //    @Query("DELETE FROM dream_table WHERE id=:id")
 //    suspend fun delete(id:Int)
+    // Delete a workout
+    @Query("DELETE FROM workout_table WHERE username=:username AND workout=:workout")
+    suspend fun deleteWorkout(username: String, workout: String)
+
+    @Query("DELETE FROM picture_table WHERE username=:username AND date=:date")
+    suspend fun deletePicture(username: String, date: String)
+
+    @Query("DELETE FROM workout_table WHERE username=:username AND workout=:workout AND exercise=:exercise")
+    suspend fun deleteWorkoutExercise(username: String, workout: String, exercise: String)
+
+    @Query("UPDATE workout_table SET sets=:sets AND reps=:reps AND rest=:rest AND weight=:weight WHERE username=:username AND workout=:workout AND exercise=:exercise")
+    suspend fun updateWorkoutExercise(sets: Int, reps: Int, rest: Int, weight: Int, username: String, workout: String, exercise: String)
 
     // get recycler view state
 //    @Query("SELECT * FROM recycler_table where id=:id")
@@ -88,6 +99,9 @@ interface AppDAO {
     @Query("UPDATE checkboxstate_table SET repsState=:repsState WHERE username=:username AND workout=:workout")
     suspend fun updateCheckBoxStateReps(repsState: String, username: String, workout: String)
 
+    @Query("UPDATE checkboxstate_table SET hasChanged=:hasChanged WHERE username=:username AND workout=:workout")
+    suspend fun updateCheckBoxStateChange(hasChanged: Int, username: String, workout: String)
+
     @Query("SELECT * FROM checkboxstate_table WHERE username=:username AND workout=:workout")
     fun getCheckBoxState(username: String, workout: String): Flow<CheckboxState>
 
@@ -129,7 +143,6 @@ interface AppDAO {
     // set checkbox
     @Query("UPDATE checkbox_table SET currCheckbox=:currCheckbox AND timerHolderPosition=:timerHolderPosition AND tag=:tag WHERE id=1")
     fun updateCheckbox(currCheckbox: Int, timerHolderPosition:Int, tag:String)
-
 
 
 }

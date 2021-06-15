@@ -41,20 +41,25 @@ class SWARecyclerFragment: Fragment() {
 
         appViewModel.getWorkoutByWorkoutName(username, workoutName).observe(this.activity as LifecycleOwner, androidx.lifecycle.Observer {
             appViewModel.getCheckBoxState(username, workoutName).observe(this.activity as LifecycleOwner, Observer { checkboxJSON ->
-                val type: Type = object : TypeToken<Array<IntArray>>() {}.type
-                var checkboxState: Array<IntArray> = Gson().fromJson(checkboxJSON.checkboxState, type)
-                var weightState: Array<IntArray> = Gson().fromJson(checkboxJSON.weightState, type)
-                var repsState: Array<IntArray> = Gson().fromJson(checkboxJSON.repsState, type)
-//                var checkboxState: Array<IntArray> = arrayOf()
-//                if(checkboxJSON != null){
-//                    val type: Type = object : TypeToken<Array<IntArray>>() {}.type
-//                    checkboxState = Gson().fromJson(checkboxJSON.checkboxState, type)
-//                }
-//                else{
-//                    for(i in it){
-//                        checkboxState += IntArray(i.sets)
-//                    }
-//                }
+                var checkboxState: Array<IntArray> = arrayOf()
+                var weightState: Array<IntArray> = arrayOf()
+                var repsState: Array<IntArray> = arrayOf()
+                if(checkboxJSON.hasChanged == 0){
+                    val type: Type = object : TypeToken<Array<IntArray>>() {}.type
+                    checkboxState = Gson().fromJson(checkboxJSON.checkboxState, type)
+                    weightState = Gson().fromJson(checkboxJSON.weightState, type)
+                    repsState = Gson().fromJson(checkboxJSON.repsState, type)
+                }
+                else{
+                    for(i in it){
+                        checkboxState += IntArray(i.sets)
+                        weightState += IntArray(i.sets) { i.weight }
+                        repsState += IntArray(i.sets) { i.reps }
+                    }
+                    appViewModel.updateCheckBoxStateChange(0, username, workoutName)
+                }
+
+
                 val adapter = FragmentWorkoutAdapter(it, (activity as StartWorkoutMainActivity), username, workoutName, checkboxState, weightState, repsState)
                 adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 recyclerView.isSaveEnabled = true

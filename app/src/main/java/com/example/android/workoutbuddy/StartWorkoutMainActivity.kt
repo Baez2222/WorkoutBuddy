@@ -162,7 +162,7 @@ class StartWorkoutMainActivity: AppCompatActivity() {
                     repsState[i][j] = 0
                 }
             }
-            appViewModel.insertCheckBoxState(CheckboxState(username, workoutName, Gson().toJson(checkboxState), Gson().toJson(weightState), Gson().toJson(repsState)))
+            appViewModel.insertCheckBoxState(CheckboxState(username, workoutName, Gson().toJson(checkboxState), Gson().toJson(weightState), Gson().toJson(repsState), 0))
         })
     }
 

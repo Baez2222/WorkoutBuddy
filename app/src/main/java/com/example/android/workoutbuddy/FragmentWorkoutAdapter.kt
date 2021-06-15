@@ -118,6 +118,7 @@ class FragmentWorkoutAdapter(private val exercises: List<Workout>, private val a
                     TableRow.LayoutParams.WRAP_CONTENT
             ).apply { gravity = Gravity.CENTER }
             CompoundButtonCompat.setButtonTintList(checkboxCompleted, ColorStateList.valueOf(Color.WHITE))
+            checkboxCompleted.setBackgroundColor(Color.BLACK)
             checkboxCompleted.isEnabled = false
 
 //            Log.println(Log.ERROR, "position:$position   + i:$i", checkboxState[position][i-1].toString())

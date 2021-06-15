@@ -1,6 +1,5 @@
 package com.example.android.workoutbuddy.database
 
-import com.example.android.workoutbuddy.Picture
 import kotlinx.coroutines.flow.Flow
 
 class AppRepository (private val appDAO: AppDAO) {
@@ -42,6 +41,21 @@ class AppRepository (private val appDAO: AppDAO) {
 //    suspend fun deleteById(id:Int){
 //        dreamDao.delete(id)
 //    }
+    suspend fun deleteWorkout(username: String, workout: String){
+        appDAO.deleteWorkout(username, workout)
+    }
+
+    suspend fun deletePicture(username: String, date: String){
+        appDAO.deletePicture(username, date)
+    }
+
+    suspend fun deleteWorkoutExercise(username: String, workout: String, exercise: String){
+        appDAO.deleteWorkoutExercise(username, workout, exercise)
+    }
+
+    suspend fun updateWorkoutExercise(sets: Int, reps: Int, rest: Int, weight: Int, username: String, workout: String, exercise: String){
+        appDAO.updateWorkoutExercise(sets, reps, rest, weight, username, workout, exercise)
+    }
 
 //    fun getRecyclerInformation(id:String): Flow<RecyclerInformation>{
 //        return appDAO.getRecyclerInformation(id)
@@ -85,6 +99,10 @@ class AppRepository (private val appDAO: AppDAO) {
 
     suspend fun updateCheckBoxStateReps(repsState: String, username: String, workout: String){
         return appDAO.updateCheckBoxStateReps(repsState, username, workout)
+    }
+
+    suspend fun updateCheckBoxStateChange(hasChanged: Int, username: String, workout: String){
+        return appDAO.updateCheckBoxStateChange(hasChanged, username, workout)
     }
 
     fun getCheckBoxState(username: String, workout: String): Flow<CheckboxState>{

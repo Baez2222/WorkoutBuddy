@@ -1,6 +1,6 @@
 package com.example.android.workoutbuddy
 
-import android.graphics.drawable.Drawable
+import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -9,22 +9,25 @@ import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.Observer
 import com.example.android.workoutbuddy.database.*
-import com.example.android.workoutbuddy.databinding.ActivityCreateworkoutBinding
+import com.example.android.workoutbuddy.databinding.ActivityUpdateworkoutBinding
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.zerobranch.layout.SwipeLayout
-import java.io.IOException
-import java.io.InputStream
+import java.lang.reflect.Type
 
-class CreateWorkoutActivity: AppCompatActivity() {
+class UpdateWorkoutActivity: AppCompatActivity() {
 
-    private lateinit var binding : ActivityCreateworkoutBinding
-    private lateinit var editText_workoutName: EditText
-    private lateinit var button_add: Button
-    private lateinit var button_submit: Button
+    private lateinit var binding: ActivityUpdateworkoutBinding
+    private lateinit var buttonSubmit: Button
+    private lateinit var buttonAdd: Button
+    private lateinit var workoutNameText: EditText
     private lateinit var linearLayout: LinearLayout
-    private lateinit var username : String
-    private lateinit var imageView_logo: ImageView
+
+    private lateinit var username: String
+    private lateinit var workoutName: String
+
 
     private val appViewModel : AppViewModel by viewModels{
         AppViewModelFactory((application as AppApplication).repository)
@@ -33,34 +36,35 @@ class CreateWorkoutActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityCreateworkoutBinding.inflate(layoutInflater)
+        binding = ActivityUpdateworkoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        editText_workoutName = binding.editTextWorkoutName
-        button_add = binding.buttonAddExercise
-        button_submit = binding.buttonSubmit
-        linearLayout = binding.linearLayoutExercises
-        imageView_logo = binding.imageView2
+
+        buttonSubmit = binding.buttonSubmit2
+        buttonAdd = binding.buttonAddExercise2
+        workoutNameText = binding.editTextWorkoutName2
+        linearLayout = binding.linearLayoutExercises2
 
         username = intent.getStringExtra("username").toString()
+        workoutName = intent.getStringExtra("workout").toString()
 
-        button_add.setOnClickListener {
+
+        workoutNameText.setText(workoutName)
+        workoutNameText.isFocusable = false
+        workoutNameText.setTextColor(Color.GRAY)
+
+        buttonAdd.setOnClickListener {
             val inflater = LayoutInflater.from(applicationContext)
             val view= inflater.inflate(R.layout.exercise_item, null)
             val deleteView: TextView = view.findViewById(R.id.right_view)
-//            val view = LayoutInflater.from(this).inflate(R.layout.exercise_item, null)
             linearLayout.addView(view, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
             deleteView.setOnClickListener {
                 linearLayout.removeView(view)
             }
         }
 
-        button_submit.setOnClickListener {
-            Log.println(Log.DEBUG, "children", linearLayout.childCount.toString())
+        buttonSubmit.setOnClickListener {
             if (linearLayout.childCount == 0){
                 Toast.makeText(this, "Exercise missing", Toast.LENGTH_SHORT).show()
-            }
-            else if (TextUtils.isEmpty(editText_workoutName.text)){
-                Toast.makeText(this, "Workout name missing", Toast.LENGTH_SHORT).show()
             }
             else{
                 var foundEmpty = false
@@ -88,23 +92,50 @@ class CreateWorkoutActivity: AppCompatActivity() {
             }
         }
 
-        // set logo
-        var inputStream: InputStream? = null
-        try {
-            inputStream = assets.open("free-logo.png")
-            val brew = Drawable.createFromStream(inputStream, null)
-            imageView_logo.setImageDrawable(brew)
-            inputStream.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
+
+        appViewModel.getWorkoutByWorkoutName(username, workoutName).observe(this, Observer {
+            if(linearLayout.childCount == 0){
+                for(i in it){
+                    val exercise = i.exercise
+                    val sets = i.sets
+                    val reps = i.reps
+                    val rest = i.rest
+                    val weight = i.weight
+
+                    val inflater = LayoutInflater.from(applicationContext)
+                    val view= inflater.inflate(R.layout.exercise_item, null)
+                    val deleteView: TextView = view.findViewById(R.id.right_view)
+
+
+                    val exerciseView: EditText = view.findViewById(R.id.editTextTextPersonName)
+                    exerciseView.setText(exercise)
+                    exerciseView.isFocusable = false
+                    exerciseView.setTextColor(Color.GRAY)
+                    val setsView: EditText = view.findViewById(R.id.editTextNumber4)
+                    setsView.setText(sets.toString())
+                    val repsView: EditText = view.findViewById(R.id.editTextNumber5)
+                    repsView.setText(reps.toString())
+                    val restView: EditText = view.findViewById(R.id.editTextNumber6)
+                    restView.setText(rest.toString())
+                    val weightView: EditText = view.findViewById(R.id.editTextNumber2)
+                    weightView.setText(weight.toString())
+
+                    linearLayout.addView(view, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+                    deleteView.setOnClickListener { _ ->
+                        appViewModel.updateCheckBoxStateChange(1, username, workoutName)
+                        appViewModel.deleteWorkoutExercise(username, workoutName, exercise)
+                        linearLayout.removeView(view)
+                    }
+                }
+            }
+        })
     }
 
     private fun addToDB(){
         var id = 0
         for ( i in 0 until linearLayout.childCount){
             val currExercise = ((linearLayout.getChildAt(i) as ConstraintLayout).getChildAt(0) as SwipeLayout).getChildAt(1) as LinearLayout
-            val workout = Workout(editText_workoutName.text.toString(), (currExercise.getChildAt(0) as EditText).text.toString(), (currExercise.getChildAt(1) as EditText).text.toString().toInt(), (currExercise.getChildAt(2) as EditText).text.toString().toInt(), (currExercise.getChildAt(3) as EditText).text.toString().toInt(), (currExercise.getChildAt(4) as EditText).text.toString().toInt(), username, 0L, id)
+            val workout = Workout(workoutNameText.text.toString(), (currExercise.getChildAt(0) as EditText).text.toString(), (currExercise.getChildAt(1) as EditText).text.toString().toInt(), (currExercise.getChildAt(2) as EditText).text.toString().toInt(), (currExercise.getChildAt(3) as EditText).text.toString().toInt(), (currExercise.getChildAt(4) as EditText).text.toString().toInt(), username, 0L, id)
             id += 1
             appViewModel.insertWorkout(workout)
         }
@@ -123,7 +154,6 @@ class CreateWorkoutActivity: AppCompatActivity() {
             repsState += IntArray(sets) { reps }
         }
         Log.println(Log.ERROR, "checkbox state", Gson().toJson(checkboxState))
-        appViewModel.insertCheckBoxState(CheckboxState(username, editText_workoutName.text.toString(), Gson().toJson(checkboxState), Gson().toJson(weightState), Gson().toJson(repsState), 0))
+        appViewModel.insertCheckBoxState(CheckboxState(username, workoutNameText.text.toString(), Gson().toJson(checkboxState), Gson().toJson(weightState), Gson().toJson(repsState), 0))
     }
-
 }

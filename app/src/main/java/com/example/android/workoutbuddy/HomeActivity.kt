@@ -13,16 +13,15 @@ import android.os.PowerManager
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
-import android.view.View.*
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.solver.widgets.ConstraintWidgetContainer.measure
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import com.example.android.workoutbuddy.database.AppApplication
 import com.example.android.workoutbuddy.database.AppViewModel
 import com.example.android.workoutbuddy.database.AppViewModelFactory
+import com.example.android.workoutbuddy.database.Picture
 import com.example.android.workoutbuddy.databinding.ActivityHomeBinding
 import java.io.File
 import java.io.IOException
@@ -93,25 +92,40 @@ class HomeActivity: AppCompatActivity() {
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         )
-                        textView.text = "   No Workouts Created."
+                        textView.text = "No Workouts Created"
+                        textView.gravity = Gravity.CENTER
                         llPopup.addView(textView)
                     } else {
                         for (element in it) {
                             if(llPopup.childCount < it.size){
-                                val button = Button(this)
-                                button.layoutParams = LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT
-                                )
-                                button.text = element
-                                button.setOnClickListener {
+                                val inflater = LayoutInflater.from(applicationContext)
+                                val view= inflater.inflate(R.layout.popupwindow_item, null)
+                                val textView: TextView = view.findViewById(R.id.textView24)
+                                textView.text = element
+                                val deleteView: TextView = view.findViewById(R.id.right_view2)
+                                val updateView: TextView = view.findViewById(R.id.left_view2)
+                                llPopup.addView(view)
+
+                                textView.setOnClickListener {
                                     val intent = Intent(this, StartWorkoutMainActivity::class.java)
                                     intent.putExtra("username", username)
-                                    intent.putExtra("workout", button.text.toString())
+                                    intent.putExtra("workout", textView.text.toString())
                                     popup.dismiss()
                                     startActivity(intent)
                                 }
-                                llPopup.addView(button)
+
+                                deleteView.setOnClickListener {
+                                    appViewModel.deleteWorkout(username, textView.text.toString())
+                                    llPopup.removeView(view)
+                                }
+
+                                updateView.setOnClickListener {
+                                    val intent = Intent(this, UpdateWorkoutActivity::class.java)
+                                    intent.putExtra("username", username)
+                                    intent.putExtra("workout", textView.text.toString())
+                                    popup.dismiss()
+                                    startActivity(intent)
+                                }
                             }
                         }
                     }
@@ -197,6 +211,7 @@ class HomeActivity: AppCompatActivity() {
 
 
         button_progressPic.setOnClickListener {
+//            deletePictureFile()
             dispatchTakePictureIntent()
         }
 
@@ -215,6 +230,20 @@ class HomeActivity: AppCompatActivity() {
             e.printStackTrace()
         }
 
+    }
+
+    // deletes picture from storage before opening camera
+    private fun deletePictureFile(){
+        val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now())
+        appViewModel.getPicture(timestamp, username).observe(this, Observer {
+            if(it != null){
+                val file2del = File(it.photoFile)
+                if(file2del.exists()){
+                    file2del.delete()
+                }
+                appViewModel.deletePicture(username, timestamp)
+            }
+        })
     }
 
     // rotate image
@@ -261,7 +290,7 @@ class HomeActivity: AppCompatActivity() {
 
     @Throws(IOException::class)
     private fun createImageFile(timeStamp: String): File? {
-        // Create an image file name
+        // Create an image file name8
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val image = File.createTempFile(
             timeStamp,  /* prefix */

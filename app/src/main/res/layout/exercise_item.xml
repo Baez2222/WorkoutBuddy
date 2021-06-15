@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/rectangleborder">
 
     <com.zerobranch.layout.SwipeLayout
         android:id="@+id/swipe_layout"
@@ -35,20 +36,22 @@
             android:id="@+id/drag_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rectangleborder"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:backgroundTint="@color/white">
+            android:background="@color/black">
 
             <EditText
                 android:id="@+id/editTextTextPersonName"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="0.29"
                 android:ems="10"
                 android:hint="Exercise"
+                android:background="@drawable/rectangleborder"
+                android:textColorHint="@color/shadow"
+                android:textColor="@color/white"
                 android:inputType="textPersonName"
                 android:textSize="14sp" />
 
@@ -59,7 +62,12 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="number" />
+                android:background="@drawable/rectangleborder"
+                android:hint="0"
+                android:textColorHint="@color/shadow"
+                android:gravity="center"
+                android:inputType="number"
+                android:textColor="@color/white"/>
 
             <EditText
                 android:id="@+id/editTextNumber5"
@@ -67,7 +75,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="number" />
+                android:background="@drawable/rectangleborder"
+                android:hint="0"
+                android:textColorHint="@color/shadow"
+                android:gravity="center"
+                android:inputType="number"
+                android:textColor="@color/white"/>
 
             <EditText
                 android:id="@+id/editTextNumber6"
@@ -75,7 +88,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="number" />
+                android:background="@drawable/rectangleborder"
+                android:hint="0"
+                android:textColorHint="@color/shadow"
+                android:gravity="center"
+                android:inputType="number"
+                android:textColor="@color/white"/>
 
             <EditText
                 android:id="@+id/editTextNumber2"
@@ -83,7 +101,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="number" />
+                android:background="@drawable/rectangleborder"
+                android:hint="0"
+                android:textColorHint="@color/shadow"
+                android:gravity="center"
+                android:inputType="number"
+                android:textColor="@color/white"/>
         </LinearLayout>
     </com.zerobranch.layout.SwipeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

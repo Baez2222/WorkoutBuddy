@@ -1,7 +1,6 @@
 package com.example.android.workoutbuddy.database
 
 import androidx.lifecycle.*
-import com.example.android.workoutbuddy.Picture
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
@@ -41,6 +40,21 @@ class AppViewModel (private val repository: AppRepository) : ViewModel() {
 //    fun deleteById(id:Int) = viewModelScope.launch {
 //        repository.deleteById(id)
 //    }
+    fun deleteWorkout(username: String, workout: String) = viewModelScope.launch {
+        repository.deleteWorkout(username, workout)
+    }
+
+    fun deletePicture(username: String, date: String) = viewModelScope.launch {
+        repository.deletePicture(username, date)
+    }
+
+    fun deleteWorkoutExercise(username: String, workout: String, exercise: String) = viewModelScope.launch {
+        repository.deleteWorkoutExercise(username, workout, exercise)
+    }
+
+    fun updateWorkoutExercise(sets: Int, reps: Int, rest: Int, weight: Int, username: String, workout: String, exercise: String) = viewModelScope.launch {
+        repository.updateWorkoutExercise(sets, reps, rest, weight, username, workout, exercise)
+    }
 //    fun getRecyclerInformation(id:String): LiveData<RecyclerInformation>{
 //        return repository.getRecyclerInformation(id).asLiveData()
 //    }
@@ -84,6 +98,10 @@ class AppViewModel (private val repository: AppRepository) : ViewModel() {
 
     fun updateCheckBoxStateReps(repsState: String, username: String, workout: String) = viewModelScope.launch {
         repository.updateCheckBoxStateReps(repsState, username, workout)
+    }
+
+    fun updateCheckBoxStateChange(hasChanged: Int, username: String, workout: String) = viewModelScope.launch {
+        repository.updateCheckBoxStateChange(hasChanged, username, workout)
     }
 
     fun getCheckBoxState(username: String, workout: String): LiveData<CheckboxState>{

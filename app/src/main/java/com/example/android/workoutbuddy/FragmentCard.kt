@@ -163,6 +163,7 @@ class FragmentCard: Fragment(), SimpleCountDownTimer.OnCountDownListener {
                     TableRow.LayoutParams.WRAP_CONTENT
             ).apply { gravity = Gravity.CENTER }
             CompoundButtonCompat.setButtonTintList(checkboxCompleted, ColorStateList.valueOf(Color.WHITE))
+            checkboxCompleted.setBackgroundColor(Color.BLACK)
 
             // check if set has already been completed
 //                Log.println(Log.ERROR, "checkboxstate", checkboxState[i - 1].toString())
@@ -207,7 +208,7 @@ class FragmentCard: Fragment(), SimpleCountDownTimer.OnCountDownListener {
                     VibrateService.startService(requireContext(), "Vibrate Foreground Service is running...") // start service
                     simpleCountDownTimer = SimpleCountDownTimer(minutes, seconds, this)
                     simpleCountDownTimer.start(false)
-                    linearTimer = LinearTimer.Builder().linearTimerView(view_.findViewById(R.id.linearTimer)).duration(rest * 1000L).build()
+                    linearTimer = LinearTimer.Builder().linearTimerView(view_.findViewById(R.id.linearTimer)).duration((rest.toLong() + 2) * 1000L).build()
                     linearTimer.startTimer()
                     checkboxState[position] = currentCheckboxState
                     appViewModel.updateCheckBoxState(Gson().toJson(checkboxState), username, workoutName)
@@ -215,6 +216,9 @@ class FragmentCard: Fragment(), SimpleCountDownTimer.OnCountDownListener {
                 }
                 // unchecks checkbox that has no running timer
                 else{
+                    if(!VibrateService.isRunning()){
+                        currentCheckbox = -1
+                    }
                     Log.println(Log.ERROR, "inside else", currentCheckbox.toString())
                     currentCheckboxState[i - 1] = 0
                     checkboxState[position] = currentCheckboxState
@@ -252,6 +256,7 @@ class FragmentCard: Fragment(), SimpleCountDownTimer.OnCountDownListener {
         }
         if(!cancel){
             VibrateService.stopService(requireContext(), true)
+            currentCheckbox = -1
         }
     }
 
