@@ -252,7 +252,7 @@ class HomeActivity: AppCompatActivity() {
             popup.isOutsideTouchable = true
             popup.showAtLocation(view, Gravity.CENTER, 0, 0)
             popup.update(750, 750)
-            Toast.makeText(this, selectedDate, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, selectedDate, Toast.LENGTH_SHORT).show()
         }
 
 
