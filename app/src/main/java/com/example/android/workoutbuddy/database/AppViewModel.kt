@@ -1,10 +1,24 @@
 package com.example.android.workoutbuddy.database
 
 import androidx.lifecycle.*
+import com.example.android.workoutbuddy.FirebaseUserLiveData
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 class AppViewModel (private val repository: AppRepository) : ViewModel() {
+
+    // user login authentication
+    enum class AuthenticationState {
+        AUTHENTICATED, UNAUTHENTICATED, INVALID_AUTHENTICATION
+    }
+
+    val authenticationState = FirebaseUserLiveData().map { user ->
+        if (user != null) {
+            AuthenticationState.AUTHENTICATED
+        } else {
+            AuthenticationState.UNAUTHENTICATED
+        }
+    }
 
     val allUsers: LiveData<List<User>> = repository.allUsers.asLiveData()
 

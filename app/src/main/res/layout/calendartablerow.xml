@@ -13,13 +13,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/roundedrectangleborder">
+        android:background="@drawable/rectangleborder">
 
         <TextView
             android:id="@+id/textView_calendarRowExercise"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:ems="4"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="-1"
+            android:ellipsize="marquee"
             android:gravity="center"
             android:text="Exercise" />
 
@@ -38,5 +42,13 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="Weight" />
+
+        <TextView
+            android:id="@+id/textView_calendarRowSets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Sets" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

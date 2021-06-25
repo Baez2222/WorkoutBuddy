@@ -54,13 +54,17 @@ class CalorieTrackerActivity: AppCompatActivity() {
 
         // get calorie intake
         appViewModel.getCalorieIntake(username).observe(this, Observer {
-            if(editText_daily.text.isEmpty()){
-                editText_daily.setText(it.toString())
-                daily = it
-                // update consumed and remainder textviews
-                textView_consumed.text = consumed.toString()
-                daily = editText_daily.text.toString().toInt() - textView_consumed.text.toString().toInt()
-                textView_remainder.text = daily.toString()
+            if (it == null) {
+                editText_daily.setText("2020")
+            } else {
+                if (editText_daily.text.isEmpty()) {
+                    editText_daily.setText(it.toString())
+                    daily = it
+                    // update consumed and remainder textviews
+                    textView_consumed.text = consumed.toString()
+                    daily = editText_daily.text.toString().toInt() - textView_consumed.text.toString().toInt()
+                    textView_remainder.text = daily.toString()
+                }
             }
         })
 
@@ -173,11 +177,9 @@ class CalorieTrackerActivity: AppCompatActivity() {
         }
     }
 
-
-
-    override fun onStop() {
-        super.onStop()
-        if(daily != editText_daily.text.toString().toInt()){
+    override fun onPause() {
+        super.onPause()
+        if(editText_daily.text.isNotEmpty()) {
             appViewModel.updateCalorieIntake(editText_daily.text.toString().toInt(), username)
         }
     }

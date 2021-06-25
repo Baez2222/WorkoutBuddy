@@ -16,6 +16,7 @@ import android.view.*
 import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import com.example.android.workoutbuddy.database.AppApplication
@@ -23,6 +24,7 @@ import com.example.android.workoutbuddy.database.AppViewModel
 import com.example.android.workoutbuddy.database.AppViewModelFactory
 import com.example.android.workoutbuddy.database.Picture
 import com.example.android.workoutbuddy.databinding.ActivityHomeBinding
+import com.firebase.ui.auth.AuthUI
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -167,28 +169,72 @@ class HomeActivity: AppCompatActivity() {
             appViewModel.getWorkoutsByDate(username, selectedDate).observe(this, Observer {
                 if (it.isEmpty() || it == null) {
                     val textViewWorkout = TextView(this)
-                    textViewWorkout.text = "No Workouts Recorded."
+                    textViewWorkout.text = "No Workouts Recorded"
                     textViewWorkout.gravity = Gravity.CENTER
                     linearLayout.addView(textViewWorkout)
                 } else {
                     var previous: String? = null
+                    // loop through each exercise
+                    var prevWeight = it[0].weight
+                    var prevExercise = it[0].exercise
+                    var setCount = 0
                     for (i in it) {
                         if (i.workout != previous) {
                             val textViewWorkout = TextView(this)
                             textViewWorkout.text = i.workout
+                            textViewWorkout.textSize = 15F
+                            textViewWorkout.isAllCaps = true
                             textViewWorkout.gravity = Gravity.CENTER
                             linearLayout.addView(textViewWorkout)
                             previous = i.workout
                         }
-                        val inflater = LayoutInflater.from(applicationContext)
-                        val tableRow = inflater.inflate(R.layout.calendartablerow, null)
-                        val exerciseName = tableRow.findViewById<TextView>(R.id.textView_calendarRowExercise)
-                        val weight = tableRow.findViewById<TextView>(R.id.textView_calendarRowWeight)
-                        val reps = tableRow.findViewById<TextView>(R.id.textView_calendarRowReps)
-                        exerciseName.text = i.exercise
-                        weight.text = i.weight.toString()
-                        reps.text = i.reps.toString()
-                        linearLayout.addView(tableRow)
+
+                        if(i.exercise != prevExercise){
+                            val inflater = LayoutInflater.from(applicationContext)
+                            val tableRow = inflater.inflate(R.layout.calendartablerow, null)
+                            val exerciseName = tableRow.findViewById<TextView>(R.id.textView_calendarRowExercise)
+                            val weight = tableRow.findViewById<TextView>(R.id.textView_calendarRowWeight)
+                            val reps = tableRow.findViewById<TextView>(R.id.textView_calendarRowReps)
+                            val sets = tableRow.findViewById<TextView>(R.id.textView_calendarRowSets)
+                            exerciseName.text = i.exercise
+                            exerciseName.isSelected = true // show all text in marquee
+                            weight.text = i.weight.toString()
+                            reps.text = i.reps.toString()
+                            sets.text = setCount.toString()
+                            linearLayout.addView(tableRow)
+
+                            prevExercise = i.exercise
+                            prevWeight = i.weight; setCount = 1
+                        }
+                        else if(i.weight != prevWeight){
+                            val inflater = LayoutInflater.from(applicationContext)
+                            val tableRow = inflater.inflate(R.layout.calendartablerow, null)
+                            val exerciseName = tableRow.findViewById<TextView>(R.id.textView_calendarRowExercise)
+                            val weight = tableRow.findViewById<TextView>(R.id.textView_calendarRowWeight)
+                            val reps = tableRow.findViewById<TextView>(R.id.textView_calendarRowReps)
+                            val sets = tableRow.findViewById<TextView>(R.id.textView_calendarRowSets)
+                            exerciseName.text = i.exercise
+                            weight.text = i.weight.toString()
+                            reps.text = i.reps.toString()
+                            sets.text = setCount.toString()
+                            linearLayout.addView(tableRow)
+
+                            prevWeight = i.weight
+                            setCount = 1
+                        }
+                        else{
+                            setCount += 1
+                        }
+
+//                        val inflater = LayoutInflater.from(applicationContext)
+//                        val tableRow = inflater.inflate(R.layout.calendartablerow, null)
+//                        val exerciseName = tableRow.findViewById<TextView>(R.id.textView_calendarRowExercise)
+//                        val weight = tableRow.findViewById<TextView>(R.id.textView_calendarRowWeight)
+//                        val reps = tableRow.findViewById<TextView>(R.id.textView_calendarRowReps)
+//                        exerciseName.text = i.exercise
+//                        weight.text = i.weight.toString()
+//                        reps.text = i.reps.toString()
+//                        linearLayout.addView(tableRow)
                     }
                 }
             })
@@ -205,7 +251,7 @@ class HomeActivity: AppCompatActivity() {
             popup.contentView = view
             popup.isOutsideTouchable = true
             popup.showAtLocation(view, Gravity.CENTER, 0, 0)
-            popup.update(750, 900)
+            popup.update(750, 750)
             Toast.makeText(this, selectedDate, Toast.LENGTH_SHORT).show();
         }
 
@@ -230,20 +276,6 @@ class HomeActivity: AppCompatActivity() {
             e.printStackTrace()
         }
 
-    }
-
-    // deletes picture from storage before opening camera
-    private fun deletePictureFile(){
-        val timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now())
-        appViewModel.getPicture(timestamp, username).observe(this, Observer {
-            if(it != null){
-                val file2del = File(it.photoFile)
-                if(file2del.exists()){
-                    file2del.delete()
-                }
-                appViewModel.deletePicture(username, timestamp)
-            }
-        })
     }
 
     // rotate image
@@ -333,6 +365,29 @@ class HomeActivity: AppCompatActivity() {
             startActivity(Intent.createChooser(sendIntent, "Send email"))
 
         })
+    }
+
+    override fun onBackPressed() {
+        val popup = PopupWindow(this)
+        val view = layoutInflater.inflate(R.layout.popuplogout, null)
+        popup.contentView = view
+        popup.isOutsideTouchable = true
+
+        val buttonYes = view.findViewById<Button>(R.id.button_logoutYes)
+        val buttonNo = view.findViewById<Button>(R.id.button_logoutNo)
+
+        buttonYes.setOnClickListener {
+            AuthUI.getInstance().signOut(applicationContext)
+            popup.dismiss()
+            Thread.sleep(250L)
+            super.onBackPressed()
+        }
+
+        buttonNo.setOnClickListener {
+            popup.dismiss()
+        }
+
+        popup.showAtLocation(view, Gravity.CENTER, 0, 0)
     }
 
 
